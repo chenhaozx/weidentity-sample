@@ -1,0 +1,39 @@
+buildscript {
+    repositories {
+        maven {
+            url "http://maven.aliyun.com/nexus/content/groups/public/"
+        }
+        mavenCentral()//依赖Maven仓库
+    }
+    dependencies {
+        //使用1.5.4.RELEASE版本的Spring框架
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.4.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'spring-boot'
+
+//生成的jar包包名和版本
+jar {
+    baseName = 'weidentity-sample-server'
+    version =  '0.1.0'
+}
+
+repositories {
+    mavenCentral()
+}
+
+//设置jdk的版本
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+//添加编译时的依赖
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web"){
+    	exclude group:"ch.qos.logback"
+    }
+    compile group: 'com.webank', name: 'weidentity-java-sdk', version: '1.0.3'
+    compile group: 'com.webank', name: 'weidentity-contract-java', version: '1.0.0'
+    compile files("libs/web3sdk.jar")  
+}

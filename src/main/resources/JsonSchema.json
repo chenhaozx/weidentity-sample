@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#", 
+    "title": "UserInforMation", 
+    "description": "five information requirements for users", 
+    "type": "object", 
+    "patternProperties": {
+        "^[a-zA-z0-9]*$": {
+            "$ref": "#/definitions/attribute"
+        }
+    }, 
+    "required": [
+        "Name", 
+        "Gender",
+		"Age",
+		"IdNumber",
+		"BirthDate"
+    ], 
+    "additionalProperties": false, 
+    "definitions": {
+        "attribute": {
+            "title": "attribute", 
+            "description": "object attribute", 
+            "type": "object", 
+            "properties": {
+                "value": {
+                    "type": "string"
+                }, 
+                "description": {
+                    "type": "string"
+                }
+            }, 
+            "required": [
+                "value"
+            ], 
+            "additionalItems": false
+        }
+    }
+}
