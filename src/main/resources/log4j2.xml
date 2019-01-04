@@ -90,13 +90,6 @@
 
     <Loggers>
         <Root level="info">
-			<!--             
-            <AppenderRef ref="asyncFile"/>
-            <AppenderRef ref="asyncDEBUG"/>
-            <AppenderRef ref="asyncINFO"/>
-            <AppenderRef ref="asyncWARN"/> 
-             -->
-            
            <AppenderRef ref="fileAppender"/>
         </Root>
     </Loggers>

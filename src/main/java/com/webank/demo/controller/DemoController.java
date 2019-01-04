@@ -67,7 +67,9 @@ public class DemoController {
         ResponseData<CreateWeIdDataResult> response = demoService.createWeIdWithSetAttr();
 
         if (response.getErrorCode().intValue() == ErrorCode.SUCCESS.getCode()) {
-            FileUtil.savePrivateKey(keyDir, response.getResult().getWeId(),
+            FileUtil.savePrivateKey(
+                keyDir, 
+                response.getResult().getWeId(),
                 response.getResult().getUserWeIdPrivateKey().getPrivateKey());
         }
         //私钥不能通过http传输
@@ -109,11 +111,10 @@ public class DemoController {
         String privateKey = paramMap.get("privateKey");
         logger.info("param,publicKey:{},privateKey:{}", publicKey, privateKey);
 
-        ResponseData<String> response = demoService.createWeIdWithSetAttr(publicKey, privateKey);
+        ResponseData<String> response = demoService.createWeIdAndSetAttr(publicKey, privateKey);
 
         if (response.getErrorCode().intValue() == ErrorCode.SUCCESS.getCode()) {
-            FileUtil.savePrivateKey(keyDir, response.getResult(),
-                privateKey);
+            FileUtil.savePrivateKey(keyDir, response.getResult(), privateKey);
         }
         return response;
     }
@@ -126,6 +127,7 @@ public class DemoController {
     @PostMapping("/registerAuthorityIssuer")
     public ResponseData<Boolean> registerAuthorityIssuer(
         @RequestBody Map<String, String> paramMap) {
+        
         String issuer = paramMap.get("issuer");
         String authorityName = paramMap.get("authorityName");
 
@@ -141,6 +143,7 @@ public class DemoController {
     @PostMapping("/registCpt")
     public ResponseData<CptBaseInfo> registCpt(@RequestBody String jsonStr)
         throws IOException {
+        
         JsonNode jsonNode = JsonLoader.fromString(jsonStr);
         String publisher = jsonNode.get("publisher").textValue();
         String claim = jsonNode.get("claim").toString();
@@ -167,8 +170,12 @@ public class DemoController {
         Integer cptId = Integer.parseInt(cptIdStr);
 
         String privateKey = FileUtil.getPrivateKeyByWeId(keyDir, issuer);
-        logger.info("param,cptId:{},issuer:{},privateKey:{},claimData:{}", cptId, issuer,
-            privateKey, claimData);
+        logger.info("param,cptId:{},issuer:{},privateKey:{},claimData:{}", 
+            cptId, 
+            issuer,
+            privateKey, 
+            claimData);
+        
         return demoService.createCredential(cptId, issuer, privateKey, claimData);
     }
 

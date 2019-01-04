@@ -52,6 +52,11 @@ public class DemoServiceImpl implements DemoService {
 
     @Autowired
     private WeIdService weIdService;
+    
+    /**
+     * 凭证有效时间 360天
+     */
+    private static final long EXPIRATION_DATE  = 1000L * 60 * 60 * 24 * 360;
 
     /**
      * 获取sdk私钥存放路径
@@ -61,7 +66,7 @@ public class DemoServiceImpl implements DemoService {
     /**
      * 通过自己的公私钥去创建weId
      */
-    public ResponseData<String> createWeIdWithSetAttr(String publicKey, String privateKey) {
+    public ResponseData<String> createWeIdAndSetAttr(String publicKey, String privateKey) {
 
         // 1,创建weId,此方法自动创建了公私钥对
         CreateWeIdArgs createWeIdArgs = new CreateWeIdArgs();
@@ -146,7 +151,8 @@ public class DemoServiceImpl implements DemoService {
 
         ResponseData<Boolean> setResponse = weIdService.setPublicKey(setPublicKeyArgs);
         logger.info("setPublicKey is result,errorCode:{},errorMessage:{}",
-            setResponse.getErrorCode(), setResponse.getErrorMessage());
+            setResponse.getErrorCode(), 
+            setResponse.getErrorMessage());
 
         return setResponse;
     }
@@ -167,7 +173,8 @@ public class DemoServiceImpl implements DemoService {
 
         ResponseData<Boolean> setResponse = weIdService.setAuthentication(setAuthenticationArgs);
         logger.info("setAuthentication is result,errorCode:{},errorMessage:{}",
-            setResponse.getErrorCode(), setResponse.getErrorMessage());
+            setResponse.getErrorCode(), 
+            setResponse.getErrorMessage());
 
         return setResponse;
     }
@@ -195,7 +202,9 @@ public class DemoServiceImpl implements DemoService {
         ResponseData<Boolean> registResponse =
             authorityIssuerService.registerAuthorityIssuer(registerAuthorityIssuerArgs);
         logger.info("registerAuthorityIssuer is result,errorCode:{},errorMessage:{}",
-            registResponse.getErrorCode(), registResponse.getErrorMessage());
+            registResponse.getErrorCode(), 
+            registResponse.getErrorMessage());
+        
         return registResponse;
     }
 
@@ -203,7 +212,10 @@ public class DemoServiceImpl implements DemoService {
      * 注册cpt
      */
     @Override
-    public ResponseData<CptBaseInfo> registCpt(String publisher, String privateKey, String claim) {
+    public ResponseData<CptBaseInfo> registCpt(
+        String publisher, 
+        String privateKey, 
+        String claim) {
 
         RegisterCptArgs registerCptArgs = new RegisterCptArgs();
         registerCptArgs.setCptPublisher(publisher);
@@ -212,8 +224,10 @@ public class DemoServiceImpl implements DemoService {
         registerCptArgs.setCptJsonSchema(claim);
 
         ResponseData<CptBaseInfo> response = cptService.registerCpt(registerCptArgs);
-        logger.info("registerCpt is result,errorCode:{},errorMessage:{}", response.getErrorCode(),
+        logger.info("registerCpt is result,errorCode:{},errorMessage:{}", 
+            response.getErrorCode(),
             response.getErrorMessage());
+        
         return response;
     }
 
@@ -221,8 +235,11 @@ public class DemoServiceImpl implements DemoService {
      * 创建电子凭证
      */
     @Override
-    public ResponseData<Credential> createCredential(Integer cptId, String issuer,
-        String privateKey, String claimDate) {
+    public ResponseData<Credential> createCredential(
+        Integer cptId, 
+        String issuer,
+        String privateKey,
+        String claimDate) {
 
         CreateCredentialArgs registerCptArgs = new CreateCredentialArgs();
         registerCptArgs.setCptId(cptId);
@@ -232,11 +249,13 @@ public class DemoServiceImpl implements DemoService {
         registerCptArgs.setClaim(claimDate);
         // 设置有效期为360天
         registerCptArgs
-            .setExpirationDate(System.currentTimeMillis() + (1000L * 60 * 60 * 24 * 360));
+            .setExpirationDate(System.currentTimeMillis() + EXPIRATION_DATE);
 
         ResponseData<Credential> response = credentialService.createCredential(registerCptArgs);
         logger.info("createCredential is result,errorCode:{},errorMessage:{}",
-            response.getErrorCode(), response.getErrorMessage());
+            response.getErrorCode(), 
+            response.getErrorMessage());
+        
         return response;
     }
 
@@ -262,7 +281,9 @@ public class DemoServiceImpl implements DemoService {
 
         verifyResponse = credentialService.verifyCredential(credential);
         logger.info("verifyCredential is result,errorCode:{},errorMessage:{}",
-            verifyResponse.getErrorCode(), verifyResponse.getErrorMessage());
+            verifyResponse.getErrorCode(), 
+            verifyResponse.getErrorMessage());
+        
         return verifyResponse;
     }
 }

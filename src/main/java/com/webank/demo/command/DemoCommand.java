@@ -48,8 +48,10 @@ public class DemoCommand {
         ToolConf toolConf = context.getBean(ToolConf.class);
         PRIVKEY = new BigInteger(toolConf.getPrivKey(), 16).toString();
         
-        SCHEMA = FileUtil.getJsonFromFile("JsonSchema.json");//获取jsonSchema
-        CLAIMDATA = FileUtil.getJsonFromFile("ClaimData.json");//获取schemaData
+        //获取jsonSchema
+        SCHEMA = FileUtil.getJsonFromFile("JsonSchema.json");
+        //获取schemaData
+        CLAIMDATA = FileUtil.getJsonFromFile("ClaimData.json");
     }
 
 
@@ -93,7 +95,7 @@ public class DemoCommand {
         BaseBean.print("issue() init...");
         // 获取服务实例
         DemoService demo = context.getBean(DemoService.class);
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new HashMap<String, String>();
         
         BaseBean.print("begin createWeId...");
         // 机构注册自己的weId,机构需要保存好自己的weId和私钥
@@ -171,7 +173,11 @@ public class DemoCommand {
         cData =  cData.replace("{userWeId}", createWeId.getWeId());
         
         Credential credential =
-            demo.createCredential(weIdResult, cptId, cData, expirationDate);
+            demo.createCredential(
+                weIdResult, 
+                cptId, 
+                cData, 
+                expirationDate);
 
         // 将电子凭证保存为json格式文件，供用户自行保管,办理业务时提供即可
         BaseBean.print("------------------------------");

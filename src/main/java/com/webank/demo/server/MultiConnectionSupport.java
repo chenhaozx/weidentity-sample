@@ -34,9 +34,9 @@ public class MultiConnectionSupport {
             public void customize(ConfigurableEmbeddedServletContainer container) {
                 if (container instanceof TomcatEmbeddedServletContainerFactory) {
                     TomcatEmbeddedServletContainerFactory containerFactory =
-                            (TomcatEmbeddedServletContainerFactory) container;
+                        (TomcatEmbeddedServletContainerFactory) container;
                     Connector connector =
-                            new Connector(TomcatEmbeddedServletContainerFactory.DEFAULT_PROTOCOL);
+                        new Connector(TomcatEmbeddedServletContainerFactory.DEFAULT_PROTOCOL);
                     connector.setPort(port);
                     containerFactory.addAdditionalTomcatConnectors(connector);
                 }

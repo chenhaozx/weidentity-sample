@@ -20,7 +20,7 @@ public interface DemoService {
      * @param privateKey 私钥
      * @return 返回处理结果，成功包含weId
      */
-    public ResponseData<String> createWeIdWithSetAttr(String publicKey, String privateKey);
+    public ResponseData<String> createWeIdAndSetAttr(String publicKey, String privateKey);
 
     /**
      * 创建weId并且set相关属性
