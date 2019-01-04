@@ -1,3 +1,5 @@
+import javafx.scene.shape.MoveTo
+
 buildscript {
     repositories {
         maven {
@@ -12,12 +14,47 @@ buildscript {
 }
 
 apply plugin: 'java'
-apply plugin: 'spring-boot'
+apply plugin: 'org.springframework.boot'
+
+//添加编译时的依赖
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web"){
+        exclude group:"ch.qos.logback"
+    }
+    compile group: 'com.webank', name: 'weidentity-java-sdk', version: '1.0.3'
+    compile group: 'com.webank', name: 'weidentity-contract-java', version: '1.0.0'
+    compile files("libs/web3sdk.jar")
+}
 
 //生成的jar包包名和版本
 jar {
-    baseName = 'weidentity-sample-server'
-    version =  '0.1.0'
+    destinationDir file('dist/app')
+    archiveName project.name + '.jar'
+    exclude '**/*.xml'
+    exclude '**/*.properties'
+    exclude '**/*.json'
+    exclude '**/*.crt'
+    exclude '**/*.cer'
+    exclude '**/*.keystore'
+    exclude '**/*.jar'
+    
+    doLast {
+        copy {
+            from file('src/main/resources/')
+            into 'dist/conf'
+        }
+        copy {
+            from configurations.compile
+            into 'dist/lib'
+        }
+        mkdir 'dist/logs'
+    }
+}
+build{
+    doLast {
+        delete "dist/app/" + project.name + ".jar"
+        file("dist/app/" + project.name + ".jar.original").renameTo("dist/app/" + project.name + ".jar")
+    }
 }
 
 repositories {
@@ -28,12 +65,7 @@ repositories {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-//添加编译时的依赖
-dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web"){
-    	exclude group:"ch.qos.logback"
-    }
-    compile group: 'com.webank', name: 'weidentity-java-sdk', version: '1.0.3'
-    compile group: 'com.webank', name: 'weidentity-contract-java', version: '1.0.0'
-    compile files("libs/web3sdk.jar")  
+
+clean {
+    delete("dist")
 }

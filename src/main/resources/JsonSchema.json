@@ -1,38 +1,21 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#", 
-    "title": "UserInforMation", 
-    "description": "five information requirements for users", 
-    "type": "object", 
-    "patternProperties": {
-        "^[a-zA-z0-9]*$": {
-            "$ref": "#/definitions/attribute"
-        }
-    }, 
-    "required": [
-        "Name", 
-        "Gender",
-		"Age",
-		"IdNumber",
-		"BirthDate"
-    ], 
-    "additionalProperties": false, 
-    "definitions": {
-        "attribute": {
-            "title": "attribute", 
-            "description": "object attribute", 
-            "type": "object", 
-            "properties": {
-                "value": {
-                    "type": "string"
-                }, 
-                "description": {
-                    "type": "string"
-                }
-            }, 
-            "required": [
-                "value"
-            ], 
-            "additionalItems": false
-        }
-    }
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "cpt templet",
+	"description": "information requirements for users",
+	"type": "object",
+	"properties": {
+		"WeId": {
+			"type": "string",
+			"description": "user weId"
+		},
+		"Name": {
+			"type": "string",
+			"description": "user name"
+		},
+		"Gender": {
+			"type": "string",
+			"description": "user gender"
+		}
+	},
+	"additionalProperties": false
 }

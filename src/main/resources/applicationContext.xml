@@ -35,7 +35,6 @@
              <prop key="issuer.contractaddress">0x1e25198d290b4de160ded447c73dfb4bfb4b24d7</prop>
       </props>
     </property>
-    <!--  <property name="location" value="classpath:application.properties" />-->
   </bean>
 
   <bean class="org.bcos.web3j.utils.Async" id="async">
@@ -83,9 +82,6 @@
             <property name="connectionsStr">
               <list>
                    <value>WeIdentity@10.107.105.225:8310</value>
-                  <!--  <value>WeIdentity@10.107.105.3:8310</value>
-                   <value>WeIdentity@10.107.105.14:8310</value>
-                   <value>WeIdentity@10.107.105.225:8310</value> -->
               </list>
             </property>
           </bean>

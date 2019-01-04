@@ -1,22 +1,5 @@
 {
-    "Name": {
-        "value": "zhangsan", 
-        "description": "the name of certificate owner"
-    }, 
-    "Gender": {
-        "value": "F", 
-        "description": "the gender of certificate owner"
-    }, 
-	"Age": {
-        "value": "22", 
-        "description": "the age of certificate owner"
-    }, 
-	"IdNumber": {
-        "value": "123456789", 
-        "description": "the idNumber of certificate owner"
-    }, 
-	"BirthDate": {
-        "value": "2018-12-26", 
-        "description": "the birthDate of certificate owner"
-    }
+	"WeId": "{userWeId}",
+	"Name": "zhangsan",
+	"Gender": "F"
 }

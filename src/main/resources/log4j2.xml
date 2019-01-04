@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="info">
     <Properties>
-        <Property name="logPath">../logs/</Property>
+        <Property name="logPath">dist/logs/</Property>
     </Properties>
     <Appenders>
         <Console name="console" target="SYSTEM_OUT">
@@ -90,11 +90,14 @@
 
     <Loggers>
         <Root level="info">
-            <!-- <AppenderRef ref="asyncFile"/>
+			<!--             
+            <AppenderRef ref="asyncFile"/>
             <AppenderRef ref="asyncDEBUG"/>
             <AppenderRef ref="asyncINFO"/>
-            <AppenderRef ref="asyncWARN"/> -->
-            <AppenderRef ref="console"/>
+            <AppenderRef ref="asyncWARN"/> 
+             -->
+            
+           <AppenderRef ref="fileAppender"/>
         </Root>
     </Loggers>
 </Configuration>
