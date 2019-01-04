@@ -100,8 +100,6 @@ public class DemoController {
      * 传入自己的公私钥,创建weId,并设置相关属性.
      * 注意此方法为演示根据公私钥创建weId,避免私钥网络传入,此处未添加Mapping,仅仅作为代码演示
      *
-     * @param publicKey 数字公钥
-     * @param privateKey 数字私钥
      */
     public ResponseData<String> createWeIdByKeys(@RequestBody Map<String, String> paramMap) {
         String publicKey = paramMap.get("publicKey");
@@ -120,7 +118,6 @@ public class DemoController {
     /**
      * 机构注册成功权威机构.
      *
-     * @param paramMap issuer机构weId   authorityName权威机构名
      * @return 返回是否成功信息
      */
     @PostMapping("/registerAuthorityIssuer")
@@ -136,8 +133,6 @@ public class DemoController {
     /**
      * 机构发布CPT.
      *
-     * @param publisher cpt发布者
-     * @param privateKey cpt发布者私钥
      * @return 返回cpt编号等信息
      */
     @PostMapping("/registCpt")
@@ -155,9 +150,6 @@ public class DemoController {
     /**
      * 机构发布电子凭证.
      *
-     * @param cptId cpt编号
-     * @param issuer 机构weId
-     * @param privateKey 机构私钥
      * @return 返回json格式的电子凭证
      * @throws IOException 
      */
