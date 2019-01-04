@@ -20,14 +20,18 @@
 package com.webank.demo.command;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.lang.reflect.Modifier;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 
 /**
  * debug class for output object information.
@@ -35,8 +39,24 @@ import java.util.Map;
  *
  */
 public class BaseBean {
+    
+    private static final Logger logger = LoggerFactory.getLogger(BaseBean.class);
+    
+    private static final String LINE_CHARAC = System.lineSeparator();
+    
+    private static final String LEFT_MID_BRACKETS = "[";
+    
+    private static final String RIGHT_MID_BRACKETS = "]";
+    
+    private static final String COLON_CHARAC = ":";
+    
+    private static final String LEFT_BRACKETS = "(";
+    
+    private static final String RIGHT_BRACKETS = ")";
+    
+    private static final String BLANK_SPACE = " ";
 
-    public static SimpleDateFormat getFormat() {
+    private static SimpleDateFormat getFormat() {
         return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     }
 
@@ -44,22 +64,34 @@ public class BaseBean {
      * printSimpe Bean.
      * @param obj  required
      */
-    public static void printSimpleBean(Object obj) {
+    private static void printSimpleBean(Object obj, StringBuilder beanStr) {
+        
+        if (null == obj) {
+            return;
+        }
+        
         Field[] f = obj.getClass().getDeclaredFields();
-        for (int i = 0; (f != null) && (i < f.length); i++) {
+        for (int i = 0; (null != f) && (i < f.length); i++) {
             try {
-                if (f[i].getModifiers() == 2) {
+                if (f[i].getModifiers() == Modifier.PRIVATE) {
                     Method m = obj.getClass().getMethod("get"
                         + f[i].getName().substring(0, 1).toUpperCase()
                         + f[i].getName().substring(1), new Class[0]);
-                    if (m != null) {
-                        System.out.println(f[i].getName() + ": " + m.invoke(obj, new Object[] {}));
+                    if (null != m) {
+                        beanStr.append(f[i].getName()).append(COLON_CHARAC).append(BLANK_SPACE)
+                            .append(String.valueOf(m.invoke(obj, new Object[] {})))
+                            .append(LINE_CHARAC);
                     }
                 }
             } catch (NoSuchMethodException ex) {
-                System.out.println("no attribute:" + f[i].getName() + " to match for the method");
-            } catch (Exception e) {
-                e.printStackTrace();
+                beanStr.append("no attribute:").append(f[i].getName())
+                    .append(" to match for the method").append(LINE_CHARAC);
+            } catch (IllegalAccessException e) {
+                logger.error("printBean error:", e);
+            } catch (IllegalArgumentException e) {
+                logger.error("printBean error:", e);
+            } catch (InvocationTargetException e) {
+                logger.error("printBean error:", e);
             }
         }
     }
@@ -69,15 +101,19 @@ public class BaseBean {
      * @param c this is object of Collection
      */
     public static void printSimpleCollection(Collection<?> c) {
-        if (c == null) {
+        if (null == c) {
             return;
         }
+        StringBuilder beanStr = new StringBuilder(LINE_CHARAC);
+        
         Iterator<?> it = c.iterator();
         int i = 0;
         while (it.hasNext()) {
-            System.out.println("[" + i++ + "]");
-            printSimpleBean(it.next());
+            beanStr.append(LEFT_MID_BRACKETS).append(i++).append(RIGHT_MID_BRACKETS)
+                .append(LINE_CHARAC);
+            printSimpleBean(it.next(), beanStr);
         }
+        logger.info(beanStr.toString());
     }
 
     /**
@@ -85,146 +121,171 @@ public class BaseBean {
      * @param map this is map
      */
     public static void printSimpleMap(Map<?, ?> map) {
-        if (map == null) {
+        if (null == map) {
             return;
         }
+        StringBuilder beanStr = new StringBuilder(LINE_CHARAC);
         Iterator<?> it = map.keySet().iterator();
         while (it.hasNext()) {
             Object obj = it.next();
             if ((obj instanceof Date)) {
-                System.out.println(getFormat().format((Date) obj) + ": " + map.get(obj));
+                beanStr.append(getFormat().format((Date) obj)).append(COLON_CHARAC)
+                    .append(BLANK_SPACE).append(map.get(obj)).append(LINE_CHARAC);
             } else {
-                System.out.println(obj + ": " + map.get(obj));
+                beanStr.append(obj).append(COLON_CHARAC).append(BLANK_SPACE)
+                    .append(map.get(obj)).append(LINE_CHARAC);
             }
         }
+        logger.info(beanStr.toString());
     }
 
-    private static void printBean(String blank, Object obj) {
-        if (isPrimitive(obj)) {
-            System.out.println(blank + obj);
+    private static void printBean(String blank, Object obj, StringBuilder beanStr) {
+        if (isSimpleValueType(obj)) {
+            beanStr.append(blank).append(String.valueOf(obj)).append(LINE_CHARAC);
             return;
         }
         if ((obj instanceof Date)) {
-            System.out.println(blank + getFormat().format(obj));
+            beanStr.append(blank).append(getFormat().format(obj)).append(LINE_CHARAC);
             return;
         }
         if ((obj instanceof String[])) {
             String[] a = (String[]) obj;
             for (int i = 0; i < a.length; i++) {
-                System.out.println("[" + i + "]" + ": " + a[i]);
+                beanStr.append(LEFT_MID_BRACKETS).append(i).append(RIGHT_MID_BRACKETS)
+                    .append(COLON_CHARAC).append(BLANK_SPACE).append(a[i]).append(LINE_CHARAC);
             }
         }
         Field[] f = obj.getClass().getDeclaredFields();
-        for (int i = 0; (f != null) && (i < f.length); i++) {
+        for (int i = 0; (null != f) && (i < f.length); i++) {
             try {
-                if (f[i].getModifiers() == 2) {
+                if (f[i].getModifiers() == Modifier.PRIVATE) {
                     Method m = obj.getClass().getMethod("get"
                         + f[i].getName().substring(0, 1).toUpperCase()
                         + f[i].getName().substring(1), new Class[0]);
 
-                    if (m != null) {
+                    if (null != m) {
                         Object left = f[i].getName();
                         Object right = m.invoke(obj, new Object[] {});
-                        printByType(blank, left, right);
+                        printByType(blank, left, right, beanStr);
                     }
                 }
             } catch (NoSuchMethodException ex) {
-                System.out.println(
-                    blank + " no attribute:" + f[i].getName() + " to match for the method");
-            } catch (Exception e) {
-                e.printStackTrace();
+                beanStr.append(blank).append(" no attribute:").append(f[i].getName())
+                    .append(" to match for the method").append(LINE_CHARAC);
+            } catch (IllegalAccessException e) {
+                logger.error("printBean error:", e);
+            } catch (IllegalArgumentException e) {
+                logger.error("printBean error:", e);
+            } catch (InvocationTargetException e) {
+                logger.error("printBean error:", e);
             }
         }
     }
 
-    private static void printCollection(String blank, Collection<?> c) {
-        if (c == null) {
+    private static void printCollection(String blank, Collection<?> c,StringBuilder beanStr) {
+        if (null == c) {
             return;
         }
         Iterator<?> it = c.iterator();
         int i = 0;
         while (it.hasNext()) {
             Object obj = it.next();
-            if (isPrimitive(obj)) {
-                System.out.println(blank + "[" + i++ + "]: " + obj);
+            if (null == obj) {
+                beanStr.append(blank).append(LEFT_MID_BRACKETS).append(i++)
+                .append(RIGHT_MID_BRACKETS).append(COLON_CHARAC)
+                .append(obj).append(LINE_CHARAC);
+                continue;
+            }
+            if (isSimpleValueType(obj)) {
+                beanStr.append(blank).append(LEFT_MID_BRACKETS).append(i++)
+                    .append(RIGHT_MID_BRACKETS).append(COLON_CHARAC)
+                    .append(obj).append(LINE_CHARAC);
             } else if ((obj instanceof Date)) {
-                System.out.println(blank + "[" + i++ + "]: " + getFormat().format(obj));
+                beanStr.append(blank).append(LEFT_MID_BRACKETS).append(i++)
+                    .append(RIGHT_MID_BRACKETS).append(COLON_CHARAC)
+                    .append(getFormat().format(obj)).append(LINE_CHARAC);
             } else {
-                System.out.println(blank + "[" + i++ + "]: " + obj.getClass().getName());
-                print(blank + "   ", obj);
+                beanStr.append(blank).append(LEFT_MID_BRACKETS).append(i++)
+                    .append(RIGHT_MID_BRACKETS).append(COLON_CHARAC)
+                    .append(obj.getClass().getName()).append(LINE_CHARAC);
+                print(blank + "   ", obj, beanStr);
             }
         }
     }
 
-    private static void printMap(String blank, Map<?, ?> map) {
-        if (map == null) {
+    private static void printMap(String blank, Map<?, ?> map, StringBuilder beanStr) {
+        if (null == map) {
             return;
         }
         Iterator<?> it = map.keySet().iterator();
         while (it.hasNext()) {
             Object left = it.next();
             Object right = map.get(left);
-            printByType(blank, left, right);
+            printByType(blank, left, right, beanStr);
         }
     }
 
-    protected static boolean isPrimitive(Object obj) {
-        if (obj == null) {
+    protected static boolean isSimpleValueType(Object obj) {
+        
+        if (null == obj) {
             return false;
         }
-        if (((obj instanceof Integer))
-            || ((obj instanceof Boolean))
-            || ((obj instanceof Character))
-            || ((obj instanceof Byte))
-            || ((obj instanceof Short))
-            || ((obj instanceof Long))
-            || ((obj instanceof Float))
-            || ((obj instanceof Double))
-            || ((obj instanceof Void))
-            || ((obj instanceof String))
-            || ((obj instanceof BigDecimal))
-            || ((obj instanceof BigInteger))
-            || (obj == null)) {
-            return true;
+        if (Date.class.isAssignableFrom(obj.getClass())) {
+            return false;
         }
-        return false;
+        return BeanUtils.isSimpleValueType(obj.getClass());
     }
 
-    private static void printByType(String blank, Object left, Object right) {
-        if (right == null) {
-            System.out.println(blank + left + ": null");
+    private static void printByType(
+        String blank, 
+        Object left, 
+        Object right, 
+        StringBuilder beanStr) {
+        
+        Object leftObj = left;
+        if (null == right) {
+            beanStr.append(blank).append(String.valueOf(leftObj)).append(COLON_CHARAC)
+                .append(right).append(LINE_CHARAC);
             return;
         }
-        if ((left != null) && ((left instanceof Date))) {
-            left = getFormat().format((Date) left);
+        if ((null != leftObj) && ((leftObj instanceof Date))) {
+            leftObj = getFormat().format((Date) leftObj);
         }
         Class<?> clazz = right.getClass();
-        if (isPrimitive(right)) {
-            System.out.println(blank + left + ": " + right);
+        if (isSimpleValueType(right)) {
+            beanStr.append(blank).append(String.valueOf(leftObj)).append(COLON_CHARAC)
+                .append(BLANK_SPACE).append(String.valueOf(right)).append(LINE_CHARAC);
         } else if ((right instanceof Date)) {
-            System.out.println(blank + left + ": " + getFormat().format(right));
+            beanStr.append(blank).append(String.valueOf(leftObj)).append(COLON_CHARAC)
+                .append(BLANK_SPACE).append(getFormat().format(right)).append(LINE_CHARAC);
         } else if ((right instanceof Collection)) {
-            System.out.println(blank + left + ":(" + clazz.getName() + ")");
-            printCollection(blank + "   ", (Collection<?>) right);
+            beanStr.append(blank).append(String.valueOf(leftObj)).append(COLON_CHARAC)
+                .append(LEFT_BRACKETS).append(clazz.getName()).append(RIGHT_BRACKETS)
+                .append(LINE_CHARAC);
+            printCollection(blank + "   ", (Collection<?>) right, beanStr);
         } else if ((right instanceof Map)) {
-            System.out.println(blank + left + ":(" + clazz.getName() + ")");
-            printMap(blank + "   ", (Map<?, ?>) right);
+            beanStr.append(blank).append(String.valueOf(leftObj)).append(COLON_CHARAC)
+                .append(LEFT_BRACKETS).append(clazz.getName()).append(RIGHT_BRACKETS)
+                .append(LINE_CHARAC);
+            printMap(blank + "   ", (Map<?, ?>) right, beanStr);
         } else {
-            System.out.println(blank + left + ":(" + clazz.getName() + ")");
-            printBean(blank + "   ", right);
+            beanStr.append(blank).append(String.valueOf(leftObj)).append(COLON_CHARAC)
+                .append(LEFT_BRACKETS).append(clazz.getName()).append(RIGHT_BRACKETS)
+                .append(LINE_CHARAC);
+            printBean(blank + "   ", right, beanStr);
         }
     }
 
-    private static void print(String blank, Object obj) {
-        if (obj == null) {
+    private static void print(String blank, Object obj, StringBuilder beanStr) {
+        if (null == obj) {
             return;
         }
         if ((obj instanceof Collection)) {
-            printCollection(blank, (Collection<?>) obj);
+            printCollection(blank, (Collection<?>) obj, beanStr);
         } else if ((obj instanceof Map)) {
-            printMap(blank, (Map<?, ?>) obj);
+            printMap(blank, (Map<?, ?>) obj, beanStr);
         } else {
-            printBean(blank, obj);
+            printBean(blank, obj, beanStr);
         }
     }
 
@@ -233,15 +294,17 @@ public class BaseBean {
      * @param obj this object for print
      */
     public static void print(Object obj) {
-        if (obj == null) {
+        StringBuilder beanStr = new StringBuilder();
+        if (null == obj) {
             return;
         }
         if ((obj instanceof Collection)) {
-            printCollection("", (Collection<?>) obj);
+            printCollection("", (Collection<?>) obj, beanStr);
         } else if ((obj instanceof Map)) {
-            printMap("", (Map<?, ?>) obj);
+            printMap("", (Map<?, ?>) obj, beanStr);
         } else {
-            printBean("", obj);
+            printBean("", obj, beanStr);
         }
+        System.out.println(beanStr.toString());
     }
 }

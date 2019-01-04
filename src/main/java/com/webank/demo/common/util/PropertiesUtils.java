@@ -7,6 +7,11 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 读取配置文件
+ * @author v_wbgyang
+ *
+ */
 public class PropertiesUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(PropertiesUtils.class);
@@ -25,7 +30,7 @@ public class PropertiesUtils {
             try {
                 props.load(resourceAsStream);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("loadProps error", e);
             }
         } finally {
             try {
@@ -33,11 +38,16 @@ public class PropertiesUtils {
                     in.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("loadProps error", e);
             }
         }
     }
 
+    /**
+     * 根据key读取配置文件中的数据
+     * @param key 配置的key
+     * @return 返回配置的value值
+     */
     public static String getProperty(String key) {
         if (null == props) {
             loadProps();
@@ -45,6 +55,12 @@ public class PropertiesUtils {
         return props.getProperty(key);
     }
 
+    /**
+     * 根据key读取配置文件中的数据,获取不到返回默认值
+     * @param key 配置的key
+     * @param defaultValue 默认值
+     * @return 返回配置的value值
+     */
     public static String getProperty(String key, String defaultValue) {
         if (null == props) {
             loadProps();

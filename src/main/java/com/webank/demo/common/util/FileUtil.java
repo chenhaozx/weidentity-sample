@@ -8,27 +8,31 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+
 import org.apache.commons.lang3.StringUtils;
-import com.webank.demo.service.impl.DemoServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * 读文件工具.
+ * 读文件工具
  * 
  * @author v_wbgyang
  *
  */
 public class FileUtil {
+    
+    private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
     /**
-     * 从文件中读取字符串数据.
+     * 从文件中读取字符串数据
      * 
      * @param fileName 文件名 默认在CLASSPATH
-     * @return
+     * @return 返回文件中的内容
      */
     public static String getJsonFromFile(String fileName) {
         BufferedReader br = null;
         try {
-            URL fileUrl = DemoServiceImpl.class.getClassLoader().getResource(fileName);
+            URL fileUrl = FileUtil.class.getClassLoader().getResource(fileName);
             String filePath = fileUrl.getFile();
             br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
             StringBuffer jsonStr = new StringBuffer();
@@ -38,7 +42,7 @@ public class FileUtil {
             }
             return jsonStr.toString();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("getJsonFromFile error", e);
             return null;
         } finally {
             if (br != null) {
@@ -57,7 +61,7 @@ public class FileUtil {
      * @param path 存储路径
      * @param weId  weId
      * @param privateKey 私钥
-     * @return
+     * @return 返回是否保存成功
      */
     public static boolean savePrivateKey(String path, String weId, String privateKey){
         try {
@@ -74,7 +78,7 @@ public class FileUtil {
             fos.close();
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("savePrivateKey error", e);
         } 
         return false;    
     }
@@ -85,7 +89,7 @@ public class FileUtil {
      * @param path
      * @param weId
      * @param privateKey
-     * @return
+     * @return 返回私钥
      */
     public static String getPrivateKeyByWeId(String path, String weId){
         try {
@@ -102,7 +106,7 @@ public class FileUtil {
             fis.close();
             return new String(buff);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("getPrivateKeyByWeId error", e);
         } 
         return StringUtils.EMPTY;
     }
@@ -110,7 +114,7 @@ public class FileUtil {
     /**
      * 检查路径是否存在
      * @param path
-     * @return
+     * @return 返回路径
      */
     private static String checkDir(String path){
         String checkPath = path;
@@ -124,6 +128,11 @@ public class FileUtil {
         return checkPath;
     }
 
+    /**
+     * 从文件中读取私钥数据
+     * @param path
+     * @return 返回私钥数据
+     */
     public static String getDataByPath(String path){
         BufferedReader bufferedReader = null;
         String privKey = null;
@@ -132,15 +141,15 @@ public class FileUtil {
                 new InputStreamReader(new FileInputStream(path)));
             privKey = bufferedReader.readLine();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error("getDataByPath error", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("getDataByPath error", e);
         } finally {
             if (bufferedReader != null) {
                 try {
                     bufferedReader.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.error("getDataByPath error", e);
                 }
             }
         }

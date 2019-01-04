@@ -32,7 +32,7 @@ import com.webank.weid.rpc.CredentialService;
 import com.webank.weid.rpc.WeIdService;
 
 /**
- * Demo服务类.
+ * Demo服务类
  *
  * @author v_wbgyang
  */
@@ -53,10 +53,13 @@ public class DemoServiceImpl implements DemoService {
     @Autowired
     private WeIdService weIdService;
 
+    /**
+     * 获取sdk私钥存放路径
+     */
     private String privKeyPath = PropertiesUtils.getProperty("admin.privKeyPath");
 
     /**
-     * 通过自己的公私钥去创建weId.
+     * 通过自己的公私钥去创建weId
      */
     public ResponseData<String> createWeIdWithSetAttr(String publicKey, String privateKey) {
 
@@ -96,7 +99,7 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * 注册weId.
+     * 注册weId
      */
     @Override
     public ResponseData<CreateWeIdDataResult> createWeIdWithSetAttr() {
@@ -129,7 +132,7 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * 设置公钥属性.
+     * 设置公钥属性
      */
     private ResponseData<Boolean> setPublicKey(CreateWeIdDataResult createWeIdDataResult) {
 
@@ -149,7 +152,7 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * 设置认证属性.
+     * 设置认证属性
      */
     private ResponseData<Boolean> setAuthenticate(CreateWeIdDataResult createWeIdDataResult) {
 
@@ -170,7 +173,7 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * 注册成为权威机构.
+     * 注册成为权威机构
      */
     @Override
     public ResponseData<Boolean> registerAuthorityIssuer(String issuer, String authorityName) {
@@ -197,7 +200,7 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * 注册cpt.
+     * 注册cpt
      */
     @Override
     public ResponseData<CptBaseInfo> registCpt(String publisher, String privateKey, String claim) {
@@ -215,7 +218,7 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * 创建电子凭证.
+     * 创建电子凭证
      */
     @Override
     public ResponseData<Credential> createCredential(Integer cptId, String issuer,
@@ -238,7 +241,7 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * 验证电子凭证.
+     * 验证电子凭证
      */
     @Override
     public ResponseData<Boolean> verifyCredential(String credentialJson) {

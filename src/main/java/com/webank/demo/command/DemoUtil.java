@@ -10,12 +10,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Map;
-
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.protocol.base.Credential;
 
@@ -25,7 +25,7 @@ import com.webank.weid.protocol.base.Credential;
  */
 public class DemoUtil {
     
-    private static final Logger logger = LoggerFactory.getLogger(DemoCommand.class);
+    private static final Logger logger = LoggerFactory.getLogger(DemoUtil.class);
     
     /**
      * 读取电子凭证
@@ -66,7 +66,7 @@ public class DemoUtil {
         try {
             credentialJson = mapper.writeValueAsString(credential);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error("writeValueAsString error:", e);
         }
         
         OutputStreamWriter ow = null;
@@ -94,7 +94,7 @@ public class DemoUtil {
                 }
             }
         }
-        return "";
+        return StringUtils.EMPTY;
     }
     
     /**
@@ -115,9 +115,9 @@ public class DemoUtil {
                 new OutputStreamWriter(new FileOutputStream("./temp.data")));
             bufferedWriter.write(s);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            logger.error("saveTemData error:", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("saveTemData error:", e);
         } finally {
             if (bufferedWriter != null) {
                 try {

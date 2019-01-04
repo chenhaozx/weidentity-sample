@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 支持http和htts.
+ * 支持http和htts
  * 
  * @author v_wbgyang
  *
@@ -17,11 +17,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MultiConnectionSupport {
      
+    /**
+     * 获取http端口
+     */
     @Value("${http.port:20191}")
     private int port;
 
     /**
-     * 同时支持 http和https.
+     * 同时支持 http和https
      * 
      */
     @Bean

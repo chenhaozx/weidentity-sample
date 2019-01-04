@@ -10,13 +10,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.webank.demo.common.util.FileUtil;
 import com.webank.weid.protocol.base.CptBaseInfo;
 import com.webank.weid.protocol.base.Credential;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.response.CreateWeIdDataResult;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 /**
  * @author v_wbpenghu
@@ -72,6 +73,9 @@ public class DemoCommand {
                 break;
             case "verifier":
                 verify();
+                break;
+            default:
+                issue();
                 break;
         }
         System.exit(0);

@@ -30,7 +30,7 @@ import com.webank.weid.protocol.response.CreateWeIdDataResult;
 import com.webank.weid.protocol.response.ResponseData;
 
 /**
- * Demo控制器.
+ * Demo控制器
  *
  * @author v_wbgyang
  */
@@ -42,6 +42,9 @@ public class DemoController {
     @Autowired
     private DemoService demoService;
 
+    /**
+     * 获取私钥存放目录
+     */
     private String keyDir = PropertiesUtils.getProperty("weid.keys.dir");
 
     /**
@@ -49,13 +52,13 @@ public class DemoController {
      */
     public final static String SCHEMA;
 
-
     static {
+        //获取schema模版数据
         SCHEMA = FileUtil.getJsonFromFile("JsonSchema.json");
     }
 
     /**
-     * 无参创建weId,并设置相关属性.
+     * 无参创建weId,并设置相关属性
      *
      * @return 返回weId和公私钥信息
      */
@@ -73,7 +76,7 @@ public class DemoController {
     }
 
     /**
-     * 创建公私钥.
+     * 创建公私钥
      * 注意此方法作为演示通过代码创建公私钥,私钥禁止网络传输,请妥善保管好自己的私钥
      * 
      * @return 返回公私钥信息
@@ -97,7 +100,7 @@ public class DemoController {
     }
 
     /**
-     * 传入自己的公私钥,创建weId,并设置相关属性.
+     * 传入自己的公私钥,创建weId,并设置相关属性
      * 注意此方法为演示根据公私钥创建weId,避免私钥网络传入,此处未添加Mapping,仅仅作为代码演示
      *
      */
@@ -116,7 +119,7 @@ public class DemoController {
     }
 
     /**
-     * 机构注册成功权威机构.
+     * 机构注册成功权威机构
      *
      * @return 返回是否成功信息
      */
@@ -131,7 +134,7 @@ public class DemoController {
     }
 
     /**
-     * 机构发布CPT.
+     * 机构发布CPT
      *
      * @return 返回cpt编号等信息
      */
@@ -148,7 +151,7 @@ public class DemoController {
     }
 
     /**
-     * 机构发布电子凭证.
+     * 机构发布电子凭证
      *
      * @return 返回json格式的电子凭证
      * @throws IOException 
@@ -170,7 +173,7 @@ public class DemoController {
     }
 
     /**
-     * 验证电子凭证.
+     * 验证电子凭证
      *
      * @param credentialJson json格式的电子凭证
      * @return 返回是否验证成功的结果
@@ -182,7 +185,7 @@ public class DemoController {
     }
 
     /**
-     * 将claim转换成schema.
+     * 将claim转换成schema
      *
      * @param claim cpt
      * @return schema jsonSchema
