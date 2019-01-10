@@ -1,12 +1,30 @@
+/*
+ *       Copyright© (2018) WeBank Co., Ltd.
+ *
+ *       This file is part of weidentity-sample.
+ *
+ *       weidentity-sample is free software: you can redistribute it and/or modify
+ *       it under the terms of the GNU Lesser General Public License as published by
+ *       the Free Software Foundation, either version 3 of the License, or
+ *       (at your option) any later version.
+ *
+ *       weidentity-sample is distributed in the hope that it will be useful,
+ *       but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *       GNU Lesser General Public License for more details.
+ *
+ *       You should have received a copy of the GNU Lesser General Public License
+ *       along with weidentity-sample.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.webank.demo.controller;
 
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
-import java.util.HashMap;
 import java.util.Map;
-import org.apache.catalina.mapper.Mapper;
+
 import org.bcos.web3j.crypto.ECKeyPair;
 import org.bcos.web3j.crypto.Keys;
 import org.slf4j.Logger;
@@ -30,7 +48,7 @@ import com.webank.weid.protocol.response.CreateWeIdDataResult;
 import com.webank.weid.protocol.response.ResponseData;
 
 /**
- * Demo控制器
+ * Demo Controller.
  *
  * @author v_wbgyang
  */
@@ -43,7 +61,8 @@ public class DemoController {
     private DemoService demoService;
 
     /**
-     * 获取私钥存放目录
+     * this directory is used to store private keys, but keep your private
+     * keys properly in your project.
      */
     private String keyDir = PropertiesUtils.getProperty("weid.keys.dir");
 
@@ -53,14 +72,14 @@ public class DemoController {
     public final static String SCHEMA;
 
     static {
-        //获取schema模版数据
-        SCHEMA = FileUtil.getJsonFromFile("JsonSchema.json");
+        // default jsonSchema template
+        SCHEMA = FileUtil.getDataByPath("./claim/JsonSchema.json");
     }
 
     /**
-     * 无参创建weId,并设置相关属性
+     * create weId without parameters and call the settings property method.
      *
-     * @return 返回weId和公私钥信息
+     * @return returns weId and public key
      */
     @PostMapping("/createWeId")
     public ResponseData<CreateWeIdDataResult> createWeId() {
@@ -72,16 +91,22 @@ public class DemoController {
                 response.getResult().getWeId(),
                 response.getResult().getUserWeIdPrivateKey().getPrivateKey());
         }
-        //私钥不能通过http传输
+        /*
+         *  private keys are not allowed to be transmitted over http, so this place
+         *  annotates the return of private keys to avoid misuse.
+         */
         response.getResult().setUserWeIdPrivateKey(null);
         return response;
     }
 
     /**
-     * 创建公私钥
-     * 注意此方法作为演示通过代码创建公私钥,私钥禁止网络传输,请妥善保管好自己的私钥
+     * create public and private keys.
      * 
-     * @return 返回公私钥信息
+     * note this method as a demonstration of how to create public and private
+     * keys by code itself. private keys do not allow network transmission.
+     * please keep the private keys you create properly.
+     * 
+     * @return returns public and private keys
      */
     public PasswordKey createKeys() {
         PasswordKey passwordKey = new PasswordKey();
@@ -102,8 +127,11 @@ public class DemoController {
     }
 
     /**
-     * 传入自己的公私钥,创建weId,并设置相关属性
-     * 注意此方法为演示根据公私钥创建weId,避免私钥网络传入,此处未添加Mapping,仅仅作为代码演示
+     * pass in your own public and private keys, create weId and set related properties.
+     * 
+     * note that as a demonstration. if weId is created based on public and private keys
+     * to avoid network transmission of private keys. mapping is not added here to avoid
+     * misuse.
      *
      */
     public ResponseData<String> createWeIdByKeys(@RequestBody Map<String, String> paramMap) {
@@ -120,9 +148,9 @@ public class DemoController {
     }
 
     /**
-     * 机构注册成功权威机构
+     * registered on the chain of institutions as authoritative bodies.
      *
-     * @return 返回是否成功信息
+     * @return true is success, false is failure.
      */
     @PostMapping("/registerAuthorityIssuer")
     public ResponseData<Boolean> registerAuthorityIssuer(
@@ -136,9 +164,10 @@ public class DemoController {
     }
 
     /**
-     * 机构发布CPT
+     * institutional publication of CPT.
      *
-     * @return 返回cpt编号等信息
+     * claim is a JSON object
+     * @return returns CptBaseInfo
      */
     @PostMapping("/registCpt")
     public ResponseData<CptBaseInfo> registCpt(@RequestBody String jsonStr)
@@ -154,10 +183,10 @@ public class DemoController {
     }
 
     /**
-     * 机构发布电子凭证
+     * institutional publication of Credential.
      *
-     * @return 返回json格式的电子凭证
-     * @throws IOException 
+     * @return returns  credential
+     * @throws IOException  it's possible to throw an exception
      */
     @PostMapping("/createCredential")
     public ResponseData<Credential> createCredential(@RequestBody String jsonStr)
@@ -180,10 +209,10 @@ public class DemoController {
     }
 
     /**
-     * 验证电子凭证
+     * verify Credential.
      *
-     * @param credentialJson json格式的电子凭证
-     * @return 返回是否验证成功的结果
+     * @param credentialJson credential in JSON format
+     * @return true is success, false is failure
      */
     @PostMapping("/verifyCredential")
     public ResponseData<Boolean> verifyCredential(@RequestBody String credentialJson) {
@@ -192,7 +221,7 @@ public class DemoController {
     }
 
     /**
-     * 将claim转换成schema
+     * converting the user's incoming claim into the required jsonSchema.
      *
      * @param claim cpt
      * @return schema jsonSchema

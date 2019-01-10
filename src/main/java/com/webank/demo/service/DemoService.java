@@ -1,3 +1,22 @@
+/*
+ *       Copyright© (2018) WeBank Co., Ltd.
+ *
+ *       This file is part of weidentity-sample.
+ *
+ *       weidentity-sample is free software: you can redistribute it and/or modify
+ *       it under the terms of the GNU Lesser General Public License as published by
+ *       the Free Software Foundation, either version 3 of the License, or
+ *       (at your option) any later version.
+ *
+ *       weidentity-sample is distributed in the hope that it will be useful,
+ *       but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *       GNU Lesser General Public License for more details.
+ *
+ *       You should have received a copy of the GNU Lesser General Public License
+ *       along with weidentity-sample.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.webank.demo.service;
 
 import com.webank.weid.protocol.base.CptBaseInfo;
@@ -6,7 +25,7 @@ import com.webank.weid.protocol.response.CreateWeIdDataResult;
 import com.webank.weid.protocol.response.ResponseData;
 
 /**
- * demo 服务接口
+ * demo interface.
  * 
  * @author v_wbgyang
  *
@@ -14,56 +33,59 @@ import com.webank.weid.protocol.response.ResponseData;
 public interface DemoService {
 
     /**
-     * 通过自己的公私钥去创建weId
+     * create weId with public and private keys and set related properties.
      * 
-     * @param publicKey 公钥
-     * @param privateKey 私钥
-     * @return 返回处理结果，成功包含weId
+     * @param publicKey public key
+     * @param privateKey private key
+     * @return returns the create weId
      */
     public ResponseData<String> createWeIdAndSetAttr(String publicKey, String privateKey);
 
     /**
-     * 创建weId并且set相关属性
+     * create weId and set related properties.
      * 
-     * @return 返回weId信息和公私钥信息
+     * @return returns the create weId  and public private keys
      */
     public ResponseData<CreateWeIdDataResult> createWeIdWithSetAttr();
 
     /**
-     * 注册为权威机构
+     * register on the chain as an authoritative body.
      * 
-     * @param authorityName
-     * @return 返回注册结果
+     * @param authorityName the name of the issue
+     * @return true is success, false is failure
      */
     public ResponseData<Boolean> registerAuthorityIssuer(String issuer, String authorityName);
 
     /**
-     * 注册cpt模版
+     * registered CPT.
      * 
-     * @param publisher 发布者weId
-     * @param privateKey 发布者私钥
-     * @param claim cpt
-     * @return 返回cpt信息
+     * @param publisher the weId of the publisher
+     * @param privateKey the private key of the publisher
+     * @param claim claim is CPT
+     * @return returns cptBaseInfo
      */
     public ResponseData<CptBaseInfo> registCpt(String publisher, String privateKey, String claim);
 
     /**
-     * 创建电子凭证
+     * create credential.
      * 
-     * @param cptId cpt编号
-     * @param issuer 机构weId
-     * @param privateKey 机构weId私钥
-     * @param claimDate cpt数据
-     * @return 返回凭证信息
+     * @param cptId the cptId of CPT 
+     * @param issuer the weId of issue
+     * @param privateKey the private key of issuer
+     * @param claimDate the data of claim
+     * @return returns credential
      */
-    public ResponseData<Credential> createCredential(Integer cptId, String issuer,
-            String privateKey, String claimDate);
+    public ResponseData<Credential> createCredential(
+        Integer cptId, 
+        String issuer,
+        String privateKey, 
+        String claimDate);
 
     /**
-     * 验证电子凭证
+     * verify credential.
      * 
-     * @param credentialJson 电子凭证
-     * @return 返回验证结果
+     * @param credentialJson credentials in JSON format
+     * @return returns the result of verify
      */
     public ResponseData<Boolean> verifyCredential(String credentialJson);
 

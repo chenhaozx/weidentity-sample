@@ -17,39 +17,26 @@
  *       along with weidentity-sample.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.webank.demo.common.dto;
+package com.webank.demo.exception;
 
 /**
- * entity classes that store public and private keys.
- * 
+ * Business Exception
  * @author v_wbgyang
  *
  */
-public class PasswordKey {
+public class BusinessException extends RuntimeException {
 
     /**
-     * private key.
+     * 
      */
-    private String privateKey;
+    private static final long serialVersionUID = -3606254083553524719L;
     
-    /**
-     * public key.
-     */
-    private String publicKey;
-
-    public String getPrivateKey() {
-        return privateKey;
+    public BusinessException(String message) {
+        super(message);
+    }
+    
+    public BusinessException(String message, Throwable e) {
+        super(message, e);
     }
 
-    public void setPrivateKey(String privateKey) {
-        this.privateKey = privateKey;
-    }
-
-    public String getPublicKey() {
-        return publicKey;
-    }
-
-    public void setPublicKey(String publicKey) {
-        this.publicKey = publicKey;
-    } 
 }

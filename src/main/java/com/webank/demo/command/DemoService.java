@@ -1,20 +1,20 @@
 /*
  *       Copyright© (2018) WeBank Co., Ltd.
  *
- *       This file is part of weidentity-java-sdk.
+ *       This file is part of weidentity-sample.
  *
- *       weidentity-java-sdk is free software: you can redistribute it and/or modify
+ *       weidentity-sample is free software: you can redistribute it and/or modify
  *       it under the terms of the GNU Lesser General Public License as published by
  *       the Free Software Foundation, either version 3 of the License, or
  *       (at your option) any later version.
  *
- *       weidentity-java-sdk is distributed in the hope that it will be useful,
+ *       weidentity-sample is distributed in the hope that it will be useful,
  *       but WITHOUT ANY WARRANTY; without even the implied warranty of
  *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *       GNU Lesser General Public License for more details.
  *
  *       You should have received a copy of the GNU Lesser General Public License
- *       along with weidentity-java-sdk.  If not, see <https://www.gnu.org/licenses/>.
+ *       along with weidentity-sample.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.webank.demo.command;
@@ -23,7 +23,7 @@ import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
+import com.webank.demo.exception.BusinessException;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.protocol.base.AuthorityIssuer;
 import com.webank.weid.protocol.base.CptBaseInfo;
@@ -43,6 +43,11 @@ import com.webank.weid.rpc.CptService;
 import com.webank.weid.rpc.CredentialService;
 import com.webank.weid.rpc.WeIdService;
 
+/**
+ * the service for command.
+ * @author v_wbgyang
+ *
+ */
 @Component
 public class DemoService {
 
@@ -61,7 +66,7 @@ public class DemoService {
     /**
      * create WeIdentity DID.
      */
-    public CreateWeIdDataResult createWeId() throws RuntimeException {
+    public CreateWeIdDataResult createWeId() throws BusinessException {
 
         // create WeIdentity DID,publicKey,privateKey
         ResponseData<CreateWeIdDataResult> responseCreate = weIdService.createWeId();
@@ -70,7 +75,7 @@ public class DemoService {
         
         // check result is success
         if (responseCreate.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
-            throw new RuntimeException(responseCreate.getErrorMessage());
+            throw new BusinessException(responseCreate.getErrorMessage());
         }
         return responseCreate.getResult();
     }
@@ -79,7 +84,7 @@ public class DemoService {
      * setPublicKey.
      */
     public void setPublicKey(CreateWeIdDataResult createResult, String keyType)
-        throws RuntimeException {
+        throws BusinessException {
 
         // setPublicKey for this WeId
         SetPublicKeyArgs setPublicKeyArgs = new SetPublicKeyArgs();
@@ -94,7 +99,7 @@ public class DemoService {
         // check is success
         if (responseSetPub.getErrorCode() != ErrorCode.SUCCESS.getCode()
             || !responseSetPub.getResult()) {
-            throw new RuntimeException(responseSetPub.getErrorMessage());
+            throw new BusinessException(responseSetPub.getErrorMessage());
         }
     }
 
@@ -105,7 +110,7 @@ public class DemoService {
         CreateWeIdDataResult createResult,
         String serviceType,
         String serviceEnpoint)
-        throws RuntimeException {
+        throws BusinessException {
 
         // setService for this WeIdentity DID
         SetServiceArgs setServiceArgs = new SetServiceArgs();
@@ -120,7 +125,7 @@ public class DemoService {
         // check is success
         if (responseSetSer.getErrorCode() != ErrorCode.SUCCESS.getCode()
             || !responseSetSer.getResult()) {
-            throw new RuntimeException(responseSetSer.getErrorMessage());
+            throw new BusinessException(responseSetSer.getErrorMessage());
         }
     }
 
@@ -128,7 +133,7 @@ public class DemoService {
      * setAuthenticate.
      */
     public void setAuthenticate(CreateWeIdDataResult createResult, String authType)
-        throws RuntimeException {
+        throws BusinessException {
 
         // setAuthenticate for this WeIdentity DID
         SetAuthenticationArgs setAuthenticationArgs = new SetAuthenticationArgs();
@@ -144,14 +149,14 @@ public class DemoService {
         // check is success
         if (responseSetAuth.getErrorCode() != ErrorCode.SUCCESS.getCode()
             || !responseSetAuth.getResult()) {
-            throw new RuntimeException(responseSetAuth.getErrorMessage());
+            throw new BusinessException(responseSetAuth.getErrorMessage());
         }
     }
 
     /**
      * getWeIdDom.
      */
-    public WeIdDocument getWeIdDom(String weId) throws RuntimeException {
+    public WeIdDocument getWeIdDom(String weId) throws BusinessException {
 
         // get weIdDom
         ResponseData<WeIdDocument> responseResult = weIdService.getWeIdDocument(weId);
@@ -161,7 +166,7 @@ public class DemoService {
         // check result
         if (responseResult.getErrorCode() != ErrorCode.SUCCESS.getCode()
             || responseResult.getResult() == null) {
-            throw new RuntimeException(responseResult.getErrorMessage());
+            throw new BusinessException(responseResult.getErrorMessage());
         }
         return responseResult.getResult();
     }
@@ -170,7 +175,7 @@ public class DemoService {
      * regist cpt.
      */
     public CptBaseInfo registCpt(CreateWeIdDataResult weIdResult, String cptJsonSchema)
-        throws RuntimeException {
+        throws BusinessException {
 
         RegisterCptArgs registerCptArgs = new RegisterCptArgs();
         WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
@@ -185,7 +190,7 @@ public class DemoService {
         // check result
         if (response.getErrorCode() != ErrorCode.SUCCESS.getCode()
             || response.getResult() == null) {
-            throw new RuntimeException(response.getErrorMessage());
+            throw new BusinessException(response.getErrorMessage());
         }
         return response.getResult();
     }
@@ -197,7 +202,7 @@ public class DemoService {
         CreateWeIdDataResult weIdResult,
         String name,
         String accValue)
-        throws RuntimeException {
+        throws BusinessException {
 
         AuthorityIssuer authorityIssuerResult = new AuthorityIssuer();
         authorityIssuerResult.setWeId(weIdResult.getWeId());
@@ -218,7 +223,7 @@ public class DemoService {
 
         // check is success
         if (response.getErrorCode() != ErrorCode.SUCCESS.getCode() || !response.getResult()) {
-            throw new RuntimeException(response.getErrorMessage());
+            throw new BusinessException(response.getErrorMessage());
         }
     }
 
@@ -230,7 +235,7 @@ public class DemoService {
         Integer cptId,
         String claim,
         long expirationDate)
-        throws RuntimeException {
+        throws BusinessException {
 
         CreateCredentialArgs args = new CreateCredentialArgs();
         args.setClaim(claim);
@@ -247,7 +252,7 @@ public class DemoService {
         // check result
         if (response.getErrorCode() != ErrorCode.SUCCESS.getCode()
             || response.getResult() == null) {
-            throw new RuntimeException(response.getErrorMessage());
+            throw new BusinessException(response.getErrorMessage());
         }
         return response.getResult();
     }
@@ -255,7 +260,7 @@ public class DemoService {
     /**
      * verifyCredential.
      */
-    public boolean verifyCredential(Credential credential) throws RuntimeException {
+    public boolean verifyCredential(Credential credential) throws BusinessException {
         
         ResponseData<Boolean> response = credentialService.verifyCredential(credential);
         BaseBean.print("verifyCredential result:");
@@ -263,7 +268,7 @@ public class DemoService {
         
         // check is success
         if (response.getErrorCode() != ErrorCode.SUCCESS.getCode()) {
-            throw new RuntimeException(response.getErrorMessage());
+            throw new BusinessException(response.getErrorMessage());
         }
         return response.getResult();
     }

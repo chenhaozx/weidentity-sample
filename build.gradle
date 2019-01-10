@@ -31,8 +31,9 @@ dependencies {
 jar {
     destinationDir file('dist/app')
     archiveName project.name + '.jar'
-    processResources { 
-    	exclude '/'
+    
+    doFirst {
+   		exclude '/*.*'
     }
     
     doLast {

@@ -1,3 +1,22 @@
+/*
+ *       Copyright© (2018) WeBank Co., Ltd.
+ *
+ *       This file is part of weidentity-sample.
+ *
+ *       weidentity-sample is free software: you can redistribute it and/or modify
+ *       it under the terms of the GNU Lesser General Public License as published by
+ *       the Free Software Foundation, either version 3 of the License, or
+ *       (at your option) any later version.
+ *
+ *       weidentity-sample is distributed in the hope that it will be useful,
+ *       but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *       GNU Lesser General Public License for more details.
+ *
+ *       You should have received a copy of the GNU Lesser General Public License
+ *       along with weidentity-sample.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.webank.demo.service.impl;
 
 import java.io.IOException;
@@ -32,7 +51,7 @@ import com.webank.weid.rpc.CredentialService;
 import com.webank.weid.rpc.WeIdService;
 
 /**
- * Demo服务类
+ * Demo service.
  *
  * @author v_wbgyang
  */
@@ -54,21 +73,27 @@ public class DemoServiceImpl implements DemoService {
     private WeIdService weIdService;
     
     /**
-     * 凭证有效时间 360天
+     * set validity period to 360 days by default.
      */
     private static final long EXPIRATION_DATE  = 1000L * 60 * 60 * 24 * 360;
 
     /**
-     * 获取sdk私钥存放路径
+     * 
+     * SDK private key storage path.
+     * 
      */
     private String privKeyPath = PropertiesUtils.getProperty("admin.privKeyPath");
 
     /**
-     * 通过自己的公私钥去创建weId
+     * create weId with public and private keys and set related properties.
+     * 
+     * @param publicKey public key
+     * @param privateKey private key
+     * @return returns the create weId
      */
     public ResponseData<String> createWeIdAndSetAttr(String publicKey, String privateKey) {
 
-        // 1,创建weId,此方法自动创建了公私钥对
+        // 1, create weId using the incoming public and private keys
         CreateWeIdArgs createWeIdArgs = new CreateWeIdArgs();
         createWeIdArgs.setPublicKey(publicKey);
         createWeIdArgs.setWeIdPrivateKey(new WeIdPrivateKey());
@@ -85,7 +110,7 @@ public class DemoServiceImpl implements DemoService {
         weIdData.setUserWeIdPublicKey(new WeIdPublicKey());
         weIdData.getUserWeIdPublicKey().setPublicKey(publicKey);
 
-        // 2,设置公钥属性
+        // 2, call set public key
         ResponseData<Boolean> setPublicKeyRes = this.setPublicKey(weIdData);
         if (!setPublicKeyRes.getResult()) {
             createResult.setErrorCode(setPublicKeyRes.getErrorCode());
@@ -93,7 +118,7 @@ public class DemoServiceImpl implements DemoService {
             return createResult;
         }
 
-        // 3,设置认证者属性
+        // 3, call set authentication
         ResponseData<Boolean> setAuthenticateRes = this.setAuthenticate(weIdData);
         if (!setAuthenticateRes.getResult()) {
             createResult.setErrorCode(setAuthenticateRes.getErrorCode());
@@ -104,12 +129,14 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * 注册weId
+     * create weId and set related properties.
+     * 
+     * @return returns the create weId  and public private keys
      */
     @Override
     public ResponseData<CreateWeIdDataResult> createWeIdWithSetAttr() {
 
-        // 1,创建weId,此方法自动创建了公私钥对
+        // 1, create weId, this method automatically creates public and private keys
         ResponseData<CreateWeIdDataResult> createResult = weIdService.createWeId();
         logger.info("weIdService is result,errorCode:{},errorMessage:{}",
             createResult.getErrorCode(), createResult.getErrorMessage());
@@ -118,7 +145,7 @@ public class DemoServiceImpl implements DemoService {
             return createResult;
         }
 
-        // 2,设置公钥属性
+        // 2, call set public key
         ResponseData<Boolean> setPublicKeyRes = this.setPublicKey(createResult.getResult());
         if (!setPublicKeyRes.getResult()) {
             createResult.setErrorCode(setPublicKeyRes.getErrorCode());
@@ -126,7 +153,7 @@ public class DemoServiceImpl implements DemoService {
             return createResult;
         }
 
-        // 3,设置认证者属性
+        // 3, call set authentication
         ResponseData<Boolean> setAuthenticateRes = this.setAuthenticate(createResult.getResult());
         if (!setAuthenticateRes.getResult()) {
             createResult.setErrorCode(setAuthenticateRes.getErrorCode());
@@ -137,7 +164,7 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * 设置公钥属性
+     * set public key
      */
     private ResponseData<Boolean> setPublicKey(CreateWeIdDataResult createWeIdDataResult) {
 
@@ -158,7 +185,7 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * 设置认证属性
+     * set authentication
      */
     private ResponseData<Boolean> setAuthenticate(CreateWeIdDataResult createWeIdDataResult) {
 
@@ -180,7 +207,10 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * 注册成为权威机构
+     * register on the chain as an authoritative body.
+     * 
+     * @param authorityName the name of the issue
+     * @return true is success, false is failure
      */
     @Override
     public ResponseData<Boolean> registerAuthorityIssuer(String issuer, String authorityName) {
@@ -209,7 +239,12 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * 注册cpt
+     * registered CPT.
+     * 
+     * @param publisher the weId of the publisher
+     * @param privateKey the private key of the publisher
+     * @param claim claim is CPT
+     * @return returns cptBaseInfo
      */
     @Override
     public ResponseData<CptBaseInfo> registCpt(
@@ -232,7 +267,13 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * 创建电子凭证
+     * create credential.
+     * 
+     * @param cptId the cptId of CPT 
+     * @param issuer the weId of issue
+     * @param privateKey the private key of issuer
+     * @param claimDate the data of claim
+     * @return returns credential
      */
     @Override
     public ResponseData<Credential> createCredential(
@@ -247,7 +288,7 @@ public class DemoServiceImpl implements DemoService {
         registerCptArgs.setWeIdPrivateKey(new WeIdPrivateKey());
         registerCptArgs.getWeIdPrivateKey().setPrivateKey(privateKey);
         registerCptArgs.setClaim(claimDate);
-        // 设置有效期为360天
+        // the validity period is 360 days
         registerCptArgs
             .setExpirationDate(System.currentTimeMillis() + EXPIRATION_DATE);
 
@@ -260,7 +301,10 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * 验证电子凭证
+     * verify credential.
+     * 
+     * @param credentialJson credentials in JSON format
+     * @return returns the result of verify
      */
     @Override
     public ResponseData<Boolean> verifyCredential(String credentialJson) {

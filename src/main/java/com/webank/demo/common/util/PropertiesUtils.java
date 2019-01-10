@@ -1,3 +1,22 @@
+/*
+ *       Copyright© (2018) WeBank Co., Ltd.
+ *
+ *       This file is part of weidentity-sample.
+ *
+ *       weidentity-sample is free software: you can redistribute it and/or modify
+ *       it under the terms of the GNU Lesser General Public License as published by
+ *       the Free Software Foundation, either version 3 of the License, or
+ *       (at your option) any later version.
+ *
+ *       weidentity-sample is distributed in the hope that it will be useful,
+ *       but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *       GNU Lesser General Public License for more details.
+ *
+ *       You should have received a copy of the GNU Lesser General Public License
+ *       along with weidentity-sample.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.webank.demo.common.util;
 
 import java.io.IOException;
@@ -8,7 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 读取配置文件
+ * read Profile tool.
+ * 
  * @author v_wbgyang
  *
  */
@@ -16,6 +36,7 @@ public class PropertiesUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(PropertiesUtils.class);
     private static Properties props;
+    private static final String APPLICATION_FILE = "application.properties";
 
     static {
         loadProps();
@@ -26,7 +47,7 @@ public class PropertiesUtils {
         InputStream in = null;
         try {
             InputStream resourceAsStream = PropertiesUtils.class.getClassLoader()
-                .getResourceAsStream("application.properties");
+                .getResourceAsStream(APPLICATION_FILE);
             try {
                 props.load(resourceAsStream);
             } catch (IOException e) {
@@ -44,9 +65,10 @@ public class PropertiesUtils {
     }
 
     /**
-     * 根据key读取配置文件中的数据
-     * @param key 配置的key
-     * @return 返回配置的value值
+     * read the value in the configuration file according to key.
+     * 
+     * @param key configured key
+     * @return returns the value of key
      */
     public static String getProperty(String key) {
         if (null == props) {
@@ -56,10 +78,12 @@ public class PropertiesUtils {
     }
 
     /**
-     * 根据key读取配置文件中的数据,获取不到返回默认值
-     * @param key 配置的key
-     * @param defaultValue 默认值
-     * @return 返回配置的value值
+     * read the value in the configuration file according to key,
+     * returns the default value when it is not available.
+     * 
+     * @param key configured key
+     * @param defaultValue  default value
+     * @return returns the value of key
      */
     public static String getProperty(String key, String defaultValue) {
         if (null == props) {

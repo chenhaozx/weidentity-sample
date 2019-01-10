@@ -1,3 +1,22 @@
+/*
+ *       Copyright© (2018) WeBank Co., Ltd.
+ *
+ *       This file is part of weidentity-sample.
+ *
+ *       weidentity-sample is free software: you can redistribute it and/or modify
+ *       it under the terms of the GNU Lesser General Public License as published by
+ *       the Free Software Foundation, either version 3 of the License, or
+ *       (at your option) any later version.
+ *
+ *       weidentity-sample is distributed in the hope that it will be useful,
+ *       but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *       GNU Lesser General Public License for more details.
+ *
+ *       You should have received a copy of the GNU Lesser General Public License
+ *       along with weidentity-sample.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.webank.demo.command;
 
 import java.io.IOException;
@@ -18,12 +37,14 @@ import com.webank.weid.protocol.base.Credential;
 import com.webank.weid.protocol.base.WeIdPrivateKey;
 import com.webank.weid.protocol.response.CreateWeIdDataResult;
 
-
 /**
+ * command operation.
+ * 
  * @author v_wbpenghu
  */
 public class DemoCommand {
 
+    // SDK private key.
     public final static String PRIVKEY;
     
     protected static ApplicationContext context;
@@ -41,19 +62,18 @@ public class DemoCommand {
     public final static String CLAIMDATA;
 
     static {
-        context = new ClassPathXmlApplicationContext(new String[]{
+        context = new ClassPathXmlApplicationContext(new String[] {
             "classpath:applicationContext.xml",
             "classpath:SpringApplicationContext-demo.xml"});
 
         ToolConf toolConf = context.getBean(ToolConf.class);
         PRIVKEY = new BigInteger(toolConf.getPrivKey(), 16).toString();
         
-        //获取jsonSchema
-        SCHEMA = FileUtil.getJsonFromFile("JsonSchema.json");
-        //获取schemaData
-        CLAIMDATA = FileUtil.getJsonFromFile("ClaimData.json");
+        //get jsonSchema.
+        SCHEMA = FileUtil.getDataByPath("./claim/JsonSchema.json");
+        //get schemaData.
+        CLAIMDATA = FileUtil.getDataByPath("./claim/ClaimData.json");
     }
-
 
 
     /**
@@ -84,43 +104,42 @@ public class DemoCommand {
     }
 
     /**
-     * 权威机构的运行流程
-     * 1.创建weId
-     * 2.set相关属性
-     * 3.链上注册为权威机构
-     * 4.创建CPT
+     * interface invocation process.
+     * 1, create weId
+     * 2, set attribute
+     * 3, registered authority
+     * 4, publish CPT
      */
     private static void issue() {
         
         BaseBean.print("issue() init...");
-        // 获取服务实例
         DemoService demo = context.getBean(DemoService.class);
         Map<String, String> map = new HashMap<String, String>();
         
         BaseBean.print("begin createWeId...");
-        // 机构注册自己的weId,机构需要保存好自己的weId和私钥
+        // registered weId, authority need to keep their own weId and private keys.
         CreateWeIdDataResult createWeId = demo.createWeId();
         map.put("weId", createWeId.getWeId());
         map.put("privateKey", createWeId.getUserWeIdPrivateKey().getPrivateKey());
         
         BaseBean.print("------------------------------");
         BaseBean.print("begin setPublicKey...");
-        // 设置公钥属性, 公钥类型默认使用 "secp256k1"
+        // call set public key, the type default "secp256k1".
         demo.setPublicKey(createWeId, "secp256k1");
         
         BaseBean.print("------------------------------");
         BaseBean.print("begin setAuthenticate...");
-        // 设置认证者属性,签名类型默认使用 "RsaSignatureAuthentication2018"
+        // call set authentication, the type default "RsaSignatureAuthentication2018".
         demo.setAuthenticate(createWeId, "RsaSignatureAuthentication2018");
         
         BaseBean.print("------------------------------");
         BaseBean.print("begin registerAuthorityIssuer...");
-        // 机构注册为权威机构, "webank"为权威机构名, "0"为默认
+        // registered authority, "webank" is the authority Name, "0" is default.
         demo.registerAuthorityIssuer(createWeId, "webank", "0");
 
         BaseBean.print("------------------------------");
         BaseBean.print("begin registCpt...");
-        // 注册cpt模版，机构需要保存好自己的模版编号cptId
+        // registered CPT, authority need to keep their own cptId.
         CptBaseInfo cptResult = demo.registCpt(createWeId, SCHEMA);
         map.put("cptId", cptResult.getCptId().toString());
         
@@ -129,13 +148,13 @@ public class DemoCommand {
         BaseBean.print("------------------------------");
         BaseBean.print("issue() finish...");
     }
-
+    
     /**
-     * 用户的运行流程:
-     * 1.用户注册weId
-     * 2.提供CPT数据,机构为其创建电子凭证
-     * 
+     * interface invocation process.
+     * 1, create weId
+     * 2, provide CPT template data, authority issue credential for them
      */
+    @SuppressWarnings("unchecked")
     private static void user() {
         
         BaseBean.print("user() init...");
@@ -143,10 +162,11 @@ public class DemoCommand {
         
         BaseBean.print("------------------------------");
         BaseBean.print("begin createWeId...");
-        // 机构注册自己的weId,机构需要保存好自己的weId和私钥
+        // user registration weId.
         CreateWeIdDataResult createWeId = demo.createWeId();
         
-        String json = FileUtil.getDataByPath("./temp.data");
+        // getting authority data from temporary file.
+        String json = FileUtil.getDataByPath(DemoUtil.TEMP_FILE);
         ObjectMapper om = new ObjectMapper();
         Map<String, String> paramMap = null;
         try {
@@ -156,7 +176,7 @@ public class DemoCommand {
             logger.error("read temp.data error", e);
         }
         
-        // 机构根据用户提供的模版数据为其创建电子凭证(weId和privateKey均所属权威机构)
+        // authority create credentials based on data provided by users.
         BaseBean.print("------------------------------");
         BaseBean.print("begin createCredential...");
         CreateWeIdDataResult weIdResult = new CreateWeIdDataResult();
@@ -165,11 +185,11 @@ public class DemoCommand {
         weIdResult.getUserWeIdPrivateKey().setPrivateKey(paramMap.get("privateKey"));
 
         long expirationDate = System.currentTimeMillis() + (1000L * 60 * 24);
-        // cptId为权威机构的模版(CPT)编号
+        // Number of CPT issued by authority.
         Integer cptId = new Integer(paramMap.get("cptId"));
 
         String cData = CLAIMDATA;
-        // 将用户weId作为cpt数据的一部分,用于识别电子凭证归属
+        // user weId is used as part of CPT data to identify credential attribution.
         cData =  cData.replace("{userWeId}", createWeId.getWeId());
         
         Credential credential =
@@ -179,7 +199,7 @@ public class DemoCommand {
                 cData, 
                 expirationDate);
 
-        // 将电子凭证保存为json格式文件，供用户自行保管,办理业务时提供即可
+        // save the credentials in a file as JSON strings.
         BaseBean.print("------------------------------");
         BaseBean.print("beign saveCredential...");
         String path = DemoUtil.saveCredential(credential);
@@ -190,18 +210,17 @@ public class DemoCommand {
     }
 
     /**
-     * 验签机构运行流程：
-     * 1.验证用户提供的电子凭证
+     * interface invocation process.
+     * 1, verify user-provided credentials
      */
     private static void verify() {
         
         BaseBean.print("verify() init...");
         DemoService demo = context.getBean(DemoService.class);
         
-        // 获取服务实例
         BaseBean.print("------------------------------");
         BaseBean.print("begin getCredentialFromJson...");
-        // 获取用户提供的电子凭证
+        // get user credentials from file.
         Credential credential = DemoUtil.getCredentialFromJson();
         BaseBean.print("getCredentialFromJson result:");
         BaseBean.print(credential);

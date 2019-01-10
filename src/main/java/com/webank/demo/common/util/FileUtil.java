@@ -1,20 +1,18 @@
 package com.webank.demo.common.util;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.webank.weid.constant.WeIdConstant;
 
 /**
- * 读文件工具
+ * file tool.
  * 
  * @author v_wbgyang
  *
@@ -22,48 +20,17 @@ import org.slf4j.LoggerFactory;
 public class FileUtil {
     
     private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
-
-    /**
-     * 从文件中读取字符串数据
-     * 
-     * @param fileName 文件名 默认在CLASSPATH
-     * @return 返回文件中的内容
-     */
-    public static String getJsonFromFile(String fileName) {
-        BufferedReader br = null;
-        try {
-            URL fileUrl = FileUtil.class.getClassLoader().getResource(fileName);
-            String filePath = fileUrl.getFile();
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
-            StringBuffer jsonStr = new StringBuffer();
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                jsonStr.append(line);
-            }
-            return jsonStr.toString();
-        } catch (Exception e) {
-            logger.error("getJsonFromFile error", e);
-            return null;
-        } finally {
-            if (br != null) {
-                try {
-                    br.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
     
     /**
-     * 此方法为通过文件存储weId私钥信息，实际场景机构自行存储私钥信息
+     * this method stores weId private key information by file and stores
+     * private key information by itself in actual scene.
      * 
-     * @param path 存储路径
-     * @param weId  weId
-     * @param privateKey 私钥
-     * @return 返回是否保存成功
+     * @param path save path
+     * @param weId the weId
+     * @param privateKey the private key
+     * @return returns saved results
      */
-    public static boolean savePrivateKey(String path, String weId, String privateKey){
+    public static boolean savePrivateKey(String path, String weId, String privateKey) {
         try {
             if (weId == null) {
                 return false;
@@ -84,14 +51,13 @@ public class FileUtil {
     }
     
     /**
-     * 根据weId获取私钥信息
+     * get the private key by weId.
      * 
-     * @param path
-     * @param weId
-     * @param privateKey
-     * @return 返回私钥
+     * @param path the path
+     * @param weId the weId
+     * @return returns the private key
      */
-    public static String getPrivateKeyByWeId(String path, String weId){
+    public static String getPrivateKeyByWeId(String path, String weId) {
         try {
             if (weId == null) {
                 return StringUtils.EMPTY;
@@ -112,11 +78,11 @@ public class FileUtil {
     }
     
     /**
-     * 检查路径是否存在
-     * @param path
-     * @return 返回路径
+     * check the path is exists, create and return the path if it does not exist.
+     * @param path the path
+     * @return returns the path
      */
-    private static String checkDir(String path){
+    public static String checkDir(String path) {
         String checkPath = path;
         if (!checkPath.endsWith("/")) {
             checkPath = checkPath + "/" ;
@@ -129,30 +95,32 @@ public class FileUtil {
     }
 
     /**
-     * 从文件中读取私钥数据
-     * @param path
-     * @return 返回私钥数据
+     * read data from the path.
+     * 
+     * @param path the path
+     * @return returns the data
      */
-    public static String getDataByPath(String path){
-        BufferedReader bufferedReader = null;
-        String privKey = null;
+    public static String getDataByPath(String path) {
+        FileInputStream fis = null;
+        String str = null;
         try {
-            bufferedReader = new BufferedReader(
-                new InputStreamReader(new FileInputStream(path)));
-            privKey = bufferedReader.readLine();
+            fis = new FileInputStream(path);
+            byte[] buff = new byte[fis.available()];
+            fis.read(buff);
+            str = new String(buff, WeIdConstant.UTF_8);
         } catch (FileNotFoundException e) {
             logger.error("getDataByPath error", e);
         } catch (IOException e) {
             logger.error("getDataByPath error", e);
         } finally {
-            if (bufferedReader != null) {
+            if (fis != null) {
                 try {
-                    bufferedReader.close();
+                    fis.close();
                 } catch (IOException e) {
                     logger.error("getDataByPath error", e);
                 }
             }
         }
-        return privKey;
+        return str;
     }
 }
