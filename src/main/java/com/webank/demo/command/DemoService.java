@@ -23,6 +23,7 @@ import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 import com.webank.demo.exception.BusinessException;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.protocol.base.AuthorityIssuer;
@@ -165,7 +166,7 @@ public class DemoService {
         
         // check result
         if (responseResult.getErrorCode() != ErrorCode.SUCCESS.getCode()
-            || responseResult.getResult() == null) {
+            || null == responseResult.getResult()) {
             throw new BusinessException(responseResult.getErrorMessage());
         }
         return responseResult.getResult();
@@ -189,7 +190,7 @@ public class DemoService {
         
         // check result
         if (response.getErrorCode() != ErrorCode.SUCCESS.getCode()
-            || response.getResult() == null) {
+            || null == response.getResult()) {
             throw new BusinessException(response.getErrorMessage());
         }
         return response.getResult();
@@ -213,7 +214,7 @@ public class DemoService {
         RegisterAuthorityIssuerArgs registerAuthorityIssuerArgs = new RegisterAuthorityIssuerArgs();
         registerAuthorityIssuerArgs.setAuthorityIssuer(authorityIssuerResult);
         registerAuthorityIssuerArgs.setWeIdPrivateKey(new WeIdPrivateKey());
-        registerAuthorityIssuerArgs.getWeIdPrivateKey().setPrivateKey(DemoCommand.PRIVKEY);
+        registerAuthorityIssuerArgs.getWeIdPrivateKey().setPrivateKey(DemoCommand.PRIVATEKEY);
 
         ResponseData<Boolean> response =
             authorityIssuerService.registerAuthorityIssuer(registerAuthorityIssuerArgs);
@@ -251,7 +252,7 @@ public class DemoService {
         
         // check result
         if (response.getErrorCode() != ErrorCode.SUCCESS.getCode()
-            || response.getResult() == null) {
+            || null == response.getResult()) {
             throw new BusinessException(response.getErrorMessage());
         }
         return response.getResult();

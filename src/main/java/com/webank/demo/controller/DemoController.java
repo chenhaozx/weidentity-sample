@@ -25,6 +25,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.fge.jackson.JsonLoader;
 import org.bcos.web3j.crypto.ECKeyPair;
 import org.bcos.web3j.crypto.Keys;
 import org.slf4j.Logger;
@@ -33,9 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.fge.jackson.JsonLoader;
 
 import com.webank.demo.common.dto.PasswordKey;
 import com.webank.demo.common.util.FileUtil;
@@ -69,7 +69,7 @@ public class DemoController {
     /**
      * jsonSchema.
      */
-    public final static String SCHEMA;
+    public static final String SCHEMA;
 
     static {
         // default jsonSchema template
@@ -101,7 +101,6 @@ public class DemoController {
 
     /**
      * create public and private keys.
-     * 
      * note this method as a demonstration of how to create public and private
      * keys by code itself. private keys do not allow network transmission.
      * please keep the private keys you create properly.
@@ -128,7 +127,6 @@ public class DemoController {
 
     /**
      * pass in your own public and private keys, create weId and set related properties.
-     * 
      * note that as a demonstration. if weId is created based on public and private keys
      * to avoid network transmission of private keys. mapping is not added here to avoid
      * misuse.
@@ -165,7 +163,6 @@ public class DemoController {
 
     /**
      * institutional publication of CPT.
-     *
      * claim is a JSON object
      * @return returns CptBaseInfo
      */

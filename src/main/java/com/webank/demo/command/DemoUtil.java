@@ -27,11 +27,12 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.webank.demo.common.util.FileUtil;
 import com.webank.weid.constant.WeIdConstant;
 import com.webank.weid.protocol.base.Credential;
@@ -69,7 +70,7 @@ public class DemoUtil {
 
     /**
      * save credential.
-     * @param credentialJson
+     * @param credential require
      */
     public static String saveCredential(Credential credential) {
         
@@ -85,7 +86,7 @@ public class DemoUtil {
         try {
             FileUtil.checkDir(TEMP_DIR);
             String fileStr = CRED_FILE;
-            File file = new File(fileStr.toString());
+            File file = new File(fileStr);
             if (file.exists()) {
                 if (!file.delete()) {
                     logger.error("delete file fail..");
@@ -112,7 +113,7 @@ public class DemoUtil {
     
     /**
      * save temporary data.
-     * @param map
+     * @param map require
      */
     public static void saveTemData(Map<String, String> map) {
         ObjectMapper mapper = new ObjectMapper();
@@ -126,7 +127,7 @@ public class DemoUtil {
         try {
             FileUtil.checkDir(TEMP_DIR);
             bufferedWriter = new BufferedWriter(
-                new OutputStreamWriter(new FileOutputStream(TEMP_FILE)));
+                new OutputStreamWriter(new FileOutputStream(TEMP_FILE), WeIdConstant.UTF_8));
             bufferedWriter.write(s);
         } catch (FileNotFoundException e) {
             logger.error("saveTemData error:", e);

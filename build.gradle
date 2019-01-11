@@ -1,4 +1,3 @@
-import javafx.scene.shape.MoveTo
 
 buildscript {
     repositories {
@@ -11,11 +10,18 @@ buildscript {
     dependencies {
         //使用1.5.4.RELEASE版本的Spring框架
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.4.RELEASE")
+        classpath "gradle.plugin.com.github.spotbugs:spotbugs-gradle-plugin:1.6.5"
     }
+}
+
+plugins {
+    id "com.github.spotbugs" version "1.6.5"
 }
 
 apply plugin: 'java'
 apply plugin: 'org.springframework.boot'
+apply plugin: 'checkstyle'
+apply plugin: "com.github.spotbugs"
 
 //添加编译时的依赖
 dependencies {
@@ -68,4 +74,38 @@ targetCompatibility = 1.8
 
 clean {
     delete("dist")
+}
+
+
+checkstyle {
+    ignoreFailures false
+    showViolations true
+    toolVersion '8.12'
+    configProperties.projectDir = project.projectDir
+    checkstyleMain.configFile = new File(project.projectDir, '/config/checkstyle/webank_google_checks.xml')
+}
+
+tasks.withType(Checkstyle) {
+    include '**/*.java'
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+
+spotbugs {
+    ignoreFailures = true
+    showProgress = true
+    toolVersion = "3.1.8"
+    effort = "max"
+    reportLevel = "low"
+    excludeFilter = file("${project.rootDir}/config/spotbugs/spotbugs_filter.xml")
+}
+
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+    reports {
+        xml.enabled false
+        html.enabled true
+        html.stylesheet resources.text.fromFile('config/spotbugs.xsl')
+    }
 }

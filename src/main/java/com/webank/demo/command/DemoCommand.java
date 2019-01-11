@@ -24,12 +24,12 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bcos.contract.tools.ToolConf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.webank.demo.common.util.FileUtil;
 import com.webank.weid.protocol.base.CptBaseInfo;
@@ -45,21 +45,21 @@ import com.webank.weid.protocol.response.CreateWeIdDataResult;
 public class DemoCommand {
 
     // SDK private key.
-    public final static String PRIVKEY;
+    static final String PRIVATEKEY;
     
-    protected static ApplicationContext context;
+    private static final  ApplicationContext context;
     
     private static final Logger logger = LoggerFactory.getLogger(DemoCommand.class);
 
     /**
      * schema.
      */
-    public final static String SCHEMA;
+    private  static final String SCHEMA;
     
     /**
      * claimData.
      */
-    public final static String CLAIMDATA;
+    private  static final String CLAIMDATA;
 
     static {
         context = new ClassPathXmlApplicationContext(new String[] {
@@ -67,7 +67,7 @@ public class DemoCommand {
             "classpath:SpringApplicationContext-demo.xml"});
 
         ToolConf toolConf = context.getBean(ToolConf.class);
-        PRIVKEY = new BigInteger(toolConf.getPrivKey(), 16).toString();
+        PRIVATEKEY = new BigInteger(toolConf.getPrivKey(), 16).toString();
         
         //get jsonSchema.
         SCHEMA = FileUtil.getDataByPath("./claim/JsonSchema.json");
@@ -81,7 +81,7 @@ public class DemoCommand {
      */
     public static void main(String[] args) {
 
-        if (args == null) {
+        if (null == args) {
             args = new String[1];
             args[0] = "issuer";
         }
@@ -163,7 +163,7 @@ public class DemoCommand {
         BaseBean.print("------------------------------");
         BaseBean.print("begin createWeId...");
         // user registration weId.
-        CreateWeIdDataResult createWeId = demo.createWeId();
+        final CreateWeIdDataResult createWeId = demo.createWeId();
         
         // getting authority data from temporary file.
         String json = FileUtil.getDataByPath(DemoUtil.TEMP_FILE);
@@ -174,6 +174,10 @@ public class DemoCommand {
         } catch (IOException e) {
             e.printStackTrace();
             logger.error("read temp.data error", e);
+        }
+        if (null == paramMap) {
+            logger.error("read temp.data is null");
+            return;
         }
         
         // authority create credentials based on data provided by users.
@@ -186,17 +190,17 @@ public class DemoCommand {
 
         long expirationDate = System.currentTimeMillis() + (1000L * 60 * 24);
         // Number of CPT issued by authority.
-        Integer cptId = new Integer(paramMap.get("cptId"));
+        Integer cptId = Integer.valueOf(paramMap.get("cptId"));
 
-        String cData = CLAIMDATA;
+        String claimDataTmp = CLAIMDATA;
         // user weId is used as part of CPT data to identify credential attribution.
-        cData =  cData.replace("{userWeId}", createWeId.getWeId());
+        claimDataTmp =  claimDataTmp.replace("{userWeId}", createWeId.getWeId());
         
         Credential credential =
             demo.createCredential(
                 weIdResult, 
                 cptId, 
-                cData, 
+                claimDataTmp, 
                 expirationDate);
 
         // save the credentials in a file as JSON strings.

@@ -27,7 +27,9 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +57,8 @@ public class BaseBean {
     private static final String RIGHT_BRACKETS = ")";
     
     private static final String BLANK_SPACE = " ";
+    
+    private static final String BLANK_STR = "null";
 
     private static SimpleDateFormat getFormat() {
         return new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -71,17 +75,15 @@ public class BaseBean {
         }
         
         Field[] f = obj.getClass().getDeclaredFields();
-        for (int i = 0; (null != f) && (i < f.length); i++) {
+        for (int i = 0; i < f.length; i++) {
             try {
                 if (f[i].getModifiers() == Modifier.PRIVATE) {
                     Method m = obj.getClass().getMethod("get"
-                        + f[i].getName().substring(0, 1).toUpperCase()
+                        + f[i].getName().substring(0, 1).toUpperCase(Locale.getDefault())
                         + f[i].getName().substring(1), new Class[0]);
-                    if (null != m) {
-                        beanStr.append(f[i].getName()).append(COLON_CHARAC).append(BLANK_SPACE)
-                            .append(String.valueOf(m.invoke(obj, new Object[] {})))
-                            .append(LINE_CHARAC);
-                    }
+                    beanStr.append(f[i].getName()).append(COLON_CHARAC).append(BLANK_SPACE)
+                        .append(String.valueOf(m.invoke(obj, new Object[] {})))
+                        .append(LINE_CHARAC);
                 }
             } catch (NoSuchMethodException ex) {
                 beanStr.append("no attribute:").append(f[i].getName())
@@ -125,15 +127,15 @@ public class BaseBean {
             return;
         }
         StringBuilder beanStr = new StringBuilder(LINE_CHARAC);
-        Iterator<?> it = map.keySet().iterator();
-        while (it.hasNext()) {
-            Object obj = it.next();
+        
+        for (Entry<?,?> entry : map.entrySet()) {
+            Object obj = entry.getKey();
             if ((obj instanceof Date)) {
                 beanStr.append(getFormat().format((Date) obj)).append(COLON_CHARAC)
-                    .append(BLANK_SPACE).append(map.get(obj)).append(LINE_CHARAC);
+                    .append(BLANK_SPACE).append(entry.getValue()).append(LINE_CHARAC);
             } else {
                 beanStr.append(obj).append(COLON_CHARAC).append(BLANK_SPACE)
-                    .append(map.get(obj)).append(LINE_CHARAC);
+                    .append(entry.getValue()).append(LINE_CHARAC);
             }
         }
         logger.info(beanStr.toString());
@@ -156,18 +158,15 @@ public class BaseBean {
             }
         }
         Field[] f = obj.getClass().getDeclaredFields();
-        for (int i = 0; (null != f) && (i < f.length); i++) {
+        for (int i = 0; i < f.length; i++) {
             try {
                 if (f[i].getModifiers() == Modifier.PRIVATE) {
                     Method m = obj.getClass().getMethod("get"
-                        + f[i].getName().substring(0, 1).toUpperCase()
+                        + f[i].getName().substring(0, 1).toUpperCase(Locale.getDefault())
                         + f[i].getName().substring(1), new Class[0]);
-
-                    if (null != m) {
-                        Object left = f[i].getName();
-                        Object right = m.invoke(obj, new Object[] {});
-                        printByType(blank, left, right, beanStr);
-                    }
+                    Object left = f[i].getName();
+                    Object right = m.invoke(obj, new Object[] {});
+                    printByType(blank, left, right, beanStr);
                 }
             } catch (NoSuchMethodException ex) {
                 beanStr.append(blank).append(" no attribute:").append(f[i].getName())
@@ -193,7 +192,7 @@ public class BaseBean {
             if (null == obj) {
                 beanStr.append(blank).append(LEFT_MID_BRACKETS).append(i++)
                 .append(RIGHT_MID_BRACKETS).append(COLON_CHARAC)
-                .append(obj).append(LINE_CHARAC);
+                .append(BLANK_STR).append(LINE_CHARAC);
                 continue;
             }
             if (isSimpleValueType(obj)) {
@@ -217,10 +216,9 @@ public class BaseBean {
         if (null == map) {
             return;
         }
-        Iterator<?> it = map.keySet().iterator();
-        while (it.hasNext()) {
-            Object left = it.next();
-            Object right = map.get(left);
+        for (Entry<?,?> entry : map.entrySet()) {
+            Object left = entry.getKey();
+            Object right = entry.getValue();
             printByType(blank, left, right, beanStr);
         }
     }
@@ -245,7 +243,7 @@ public class BaseBean {
         Object leftObj = left;
         if (null == right) {
             beanStr.append(blank).append(String.valueOf(leftObj)).append(COLON_CHARAC)
-                .append(right).append(LINE_CHARAC);
+                .append(BLANK_STR).append(LINE_CHARAC);
             return;
         }
         if ((null != leftObj) && ((leftObj instanceof Date))) {

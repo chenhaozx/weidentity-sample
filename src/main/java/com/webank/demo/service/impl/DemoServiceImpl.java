@@ -22,11 +22,11 @@ package com.webank.demo.service.impl;
 import java.io.IOException;
 import java.math.BigInteger;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.webank.demo.common.util.FileUtil;
 import com.webank.demo.common.util.PropertiesUtils;
@@ -78,9 +78,7 @@ public class DemoServiceImpl implements DemoService {
     private static final long EXPIRATION_DATE  = 1000L * 60 * 60 * 24 * 360;
 
     /**
-     * 
      * SDK private key storage path.
-     * 
      */
     private String privKeyPath = PropertiesUtils.getProperty("admin.privKeyPath");
 
@@ -164,7 +162,7 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * set public key
+     * set public key.
      */
     private ResponseData<Boolean> setPublicKey(CreateWeIdDataResult createWeIdDataResult) {
 
@@ -185,7 +183,7 @@ public class DemoServiceImpl implements DemoService {
     }
 
     /**
-     * set authentication
+     * set authentication.
      */
     private ResponseData<Boolean> setAuthenticate(CreateWeIdDataResult createWeIdDataResult) {
 

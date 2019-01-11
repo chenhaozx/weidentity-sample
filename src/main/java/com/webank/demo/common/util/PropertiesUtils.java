@@ -42,25 +42,14 @@ public class PropertiesUtils {
         loadProps();
     }
 
-    synchronized static private void loadProps() {
+    private static synchronized void loadProps() {
         props = new Properties();
-        InputStream in = null;
+        InputStream resourceAsStream = PropertiesUtils.class.getClassLoader()
+            .getResourceAsStream(APPLICATION_FILE);
         try {
-            InputStream resourceAsStream = PropertiesUtils.class.getClassLoader()
-                .getResourceAsStream(APPLICATION_FILE);
-            try {
-                props.load(resourceAsStream);
-            } catch (IOException e) {
-                logger.error("loadProps error", e);
-            }
-        } finally {
-            try {
-                if (null != in) {
-                    in.close();
-                }
-            } catch (IOException e) {
-                logger.error("loadProps error", e);
-            }
+            props.load(resourceAsStream);
+        } catch (IOException e) {
+            logger.error("loadProps error", e);
         }
     }
 

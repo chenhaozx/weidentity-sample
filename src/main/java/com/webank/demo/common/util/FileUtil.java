@@ -9,6 +9,7 @@ import java.io.IOException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.webank.weid.constant.WeIdConstant;
 
 /**
@@ -31,22 +32,29 @@ public class FileUtil {
      * @return returns saved results
      */
     public static boolean savePrivateKey(String path, String weId, String privateKey) {
+        FileOutputStream fos = null;
         try {
-            if (weId == null) {
+            if (null == weId) {
                 return false;
             }
-            String fileName = weId.substring(weId.lastIndexOf(":")+1);
-            
+            String fileName = weId.substring(weId.lastIndexOf(":") + 1);
             String chckPath = checkDir(path);
             String filePath = chckPath + fileName;
             File file = new File(filePath);
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.write(privateKey.getBytes());
-            fos.close();
+            fos = new FileOutputStream(file);
+            fos.write(privateKey.getBytes(WeIdConstant.UTF_8));
             return true;
         } catch (IOException e) {
             logger.error("savePrivateKey error", e);
-        } 
+        } finally {
+            if (null != fos) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    logger.error("fis.close error", e);
+                }
+            }
+        }
         return false;    
     }
     
@@ -58,22 +66,32 @@ public class FileUtil {
      * @return returns the private key
      */
     public static String getPrivateKeyByWeId(String path, String weId) {
+        FileInputStream fis = null;
         try {
-            if (weId == null) {
+            if (null == weId) {
                 return StringUtils.EMPTY;
             }
-            String fileName = weId.substring(weId.lastIndexOf(":")+1);
+            String fileName = weId.substring(weId.lastIndexOf(":") + 1);
             String chckPath = checkDir(path);
             String filePath = chckPath + fileName;
             File file = new File(filePath);
-            FileInputStream fis = new FileInputStream(file);
+            fis = new FileInputStream(file);
             byte[] buff = new byte[fis.available()];
-            fis.read(buff);
-            fis.close();
-            return new String(buff);
+            int size = fis.read(buff);
+            if (size > 0) {
+                return new String(buff, WeIdConstant.UTF_8);
+            }
         } catch (IOException e) {
             logger.error("getPrivateKeyByWeId error", e);
-        } 
+        } finally {
+            if (null != fis) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    logger.error("fis.close error", e);
+                }
+            }
+        }
         return StringUtils.EMPTY;
     }
     
@@ -85,11 +103,14 @@ public class FileUtil {
     public static String checkDir(String path) {
         String checkPath = path;
         if (!checkPath.endsWith("/")) {
-            checkPath = checkPath + "/" ;
+            checkPath = checkPath + "/";
         }
         File checkDir = new File(checkPath);
         if (!checkDir.exists()) {
-            checkDir.mkdirs();
+            boolean success = checkDir.mkdirs();
+            if (!success) {
+                logger.error("checkDir.mkdirs");
+            }
         }
         return checkPath;
     }
@@ -106,14 +127,16 @@ public class FileUtil {
         try {
             fis = new FileInputStream(path);
             byte[] buff = new byte[fis.available()];
-            fis.read(buff);
-            str = new String(buff, WeIdConstant.UTF_8);
+            int size = fis.read(buff);
+            if (size > 0) {
+                str = new String(buff, WeIdConstant.UTF_8);
+            }
         } catch (FileNotFoundException e) {
             logger.error("getDataByPath error", e);
         } catch (IOException e) {
             logger.error("getDataByPath error", e);
         } finally {
-            if (fis != null) {
+            if (null != fis) {
                 try {
                     fis.close();
                 } catch (IOException e) {
