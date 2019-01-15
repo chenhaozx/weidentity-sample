@@ -1,6 +1,6 @@
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"title": "cpt templet",
+	"title": "cpt template",
 	"description": "information requirements for users",
 	"type": "object",
 	"properties": {
